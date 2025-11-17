@@ -2,8 +2,9 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { Music, Heart, Users, Sparkles, LucideIcon } from 'lucide-react';
+import { Music, Heart, Users, Sparkles, Scale, LucideIcon } from 'lucide-react';
 import Card from './ui/Card';
+import ImagePlaceholder from './ui/ImagePlaceholder';
 import { SITE_CONFIG } from '@/lib/constants';
 import { staggerContainer, cardItem } from '@/lib/animations';
 import { useMousePosition, getMouseInfluence, interpolateColor } from '@/lib/gradients';
@@ -14,6 +15,7 @@ const iconMap: Record<string, LucideIcon> = {
   Heart,
   Users,
   Sparkles,
+  Scale,
 };
 
 interface CardPosition {
@@ -106,83 +108,103 @@ export default function TeamFeatures() {
   return (
     <section
       id="features"
-      className="relative py-20 px-4 bg-linear-to-b from-neutral-900 to-neutral-800"
+      className="relative py-12 px-4 overflow-hidden min-h-screen"
     >
-      <div className="max-w-7xl mx-auto">
-        {/* 标题 */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            团队特色
-          </h2>
-          <p className="text-lg text-neutral-300">
-            我们的四大核心优势
-          </p>
-        </motion.div>
+      {/* 背景图片 - 全屏 */}
+      <div className="absolute inset-0 z-0">
+        <ImagePlaceholder
+          src={SITE_CONFIG.images.featuresBackground}
+          alt="团队特色背景"
+          fill
+          className="w-full h-full"
+          imageClassName="object-cover"
+          placeholderText="特色背景图待补充"
+          suggestedSize="1920x1080px"
+          rounded={false}
+        />
+      </div>
 
-        {/* 特色卡片网格 */}
-        <motion.div
-          ref={containerRef}
-          variants={staggerContainer}
-          initial="initial"
-          animate={isInView ? 'animate' : 'initial'}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {SITE_CONFIG.features.map((feature, index) => {
-            const IconComponent = iconMap[feature.icon];
-            
-            return (
-              <motion.div
-                key={index}
-                ref={(el) => {
-                  cardRefs.current[index] = el;
-                }}
-                variants={cardItem}
-              >
-                <Card
-                  className="p-6 h-full"
-                  style={getCardStyle(index)}
-                  hoverScale={true}
-                  hoverShadow={true}
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* 左侧内容区域 - 占据 1/3 宽度 */}
+        <div className="w-full lg:w-1/3">
+          {/* 标题 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              团队特色
+            </h2>
+            <p className="text-lg text-neutral-300">
+              我们的四大核心优势
+            </p>
+          </motion.div>
+
+          {/* 特色卡片 - 垂直排列 */}
+          <motion.div
+            ref={containerRef}
+            variants={staggerContainer}
+            initial="initial"
+            animate={isInView ? 'animate' : 'initial'}
+            className="space-y-6"
+          >
+            {SITE_CONFIG.features.map((feature, index) => {
+              const IconComponent = iconMap[feature.icon];
+              
+              return (
+                <motion.div
+                  key={index}
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                  }}
+                  variants={cardItem}
                 >
-                  <div className="flex flex-col items-center text-center h-full">
-                    {/* 图标 */}
-                    <motion.div
-                      className="mb-4"
-                      animate={{
-                        color: getIconColor(index),
-                      }}
-                      transition={{
-                        duration: 0.3,
-                      }}
-                    >
-                      {IconComponent && (
-                        <IconComponent
-                          size={48}
-                          strokeWidth={1.5}
-                        />
-                      )}
-                    </motion.div>
+                  <Card
+                    className="p-6"
+                    style={getCardStyle(index)}
+                    hoverScale={true}
+                    hoverShadow={true}
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* 图标 */}
+                      <motion.div
+                        className="flex-shrink-0"
+                        animate={{
+                          color: getIconColor(index),
+                        }}
+                        transition={{
+                          duration: 0.3,
+                        }}
+                      >
+                        {IconComponent && (
+                          <IconComponent
+                            size={40}
+                            strokeWidth={1.5}
+                          />
+                        )}
+                      </motion.div>
 
-                    {/* 标题 */}
-                    <h3 className="text-xl font-bold text-white mb-3">
-                      {feature.title}
-                    </h3>
+                      {/* 文字内容 */}
+                      <div className="flex-1">
+                        {/* 标题 */}
+                        <h3 className="text-lg font-bold text-white mb-2">
+                          {feature.title}
+                        </h3>
 
-                    {/* 描述 */}
-                    <p className="text-neutral-200 text-sm leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+                        {/* 描述 */}
+                        <p className="text-neutral-200 text-sm leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

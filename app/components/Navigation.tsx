@@ -63,15 +63,54 @@ export default function Navigation() {
             {/* Logo / 品牌名称 */}
             <motion.button
               onClick={() => scrollToSection("#hero")}
-              className={`text-xl md:text-2xl font-bold transition-colors ${
-                isScrolled
-                  ? "text-gray-900 hover:text-purple-600"
-                  : "text-white hover:text-purple-300"
-              }`}
+              className="flex items-center gap-3 group"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Funk & Love
+              {/* Logo 图标 - 根据滚动和 hover 状态切换 */}
+              <div className="relative w-8 h-8 md:w-10 md:h-10">
+                {/* 未滚动 - 默认白色 */}
+                <img
+                  src="https://funkandlove-main.s3.bitiful.net/public/icon.png"
+                  alt="Funk & Love Logo"
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                    isScrolled ? "opacity-0" : "opacity-100 group-hover:opacity-0"
+                  }`}
+                />
+                {/* 未滚动 - hover 浅紫色 */}
+                <img
+                  src="https://funkandlove-main.s3.bitiful.net/public/icon-lightpurple.png"
+                  alt="Funk & Love Logo"
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                    isScrolled ? "opacity-0" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                />
+                {/* 滚动后 - 默认黑色 */}
+                <img
+                  src="https://funkandlove-main.s3.bitiful.net/public/icon-black.png"
+                  alt="Funk & Love Logo"
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                    isScrolled ? "opacity-100 group-hover:opacity-0" : "opacity-0"
+                  }`}
+                />
+                {/* 滚动后 - hover 深紫色 */}
+                <img
+                  src="https://funkandlove-main.s3.bitiful.net/public/icon-darkpurple.png"
+                  alt="Funk & Love Logo"
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                    isScrolled ? "opacity-0 group-hover:opacity-100" : "opacity-0"
+                  }`}
+                />
+              </div>
+              
+              {/* 文字 */}
+              <span className={`text-xl md:text-2xl font-bold transition-colors ${
+                isScrolled
+                  ? "text-gray-900 group-hover:text-purple-600"
+                  : "text-white group-hover:text-purple-300"
+              }`}>
+                Funk & Love
+              </span>
             </motion.button>
 
             {/* 桌面端导航链接 */}

@@ -76,12 +76,13 @@ export default function TeamInfo() {
             variants={slideInLeft}
             className="relative"
           >
-            <div className="relative aspect-4/3 w-full">
+            <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl">
               <ImagePlaceholder
                 src={SITE_CONFIG.images.teamPhoto}
                 alt="Funk & Love 团队合照"
                 fill
                 className="w-full h-full"
+                imageClassName="object-cover"
                 suggestedSize="1200x800px"
                 placeholderText="团队合照待补充"
               />

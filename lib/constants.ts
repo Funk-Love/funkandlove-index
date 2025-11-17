@@ -49,24 +49,24 @@ export const SITE_CONFIG = {
   // 团队特色 - 4个核心特色点
   features: [
     {
-      icon: "Music",
-      title: "充满律动的Locking舞蹈",
-      description: "专业的Locking技巧训练，感受放克音乐的魅力"
+      icon: "Scale",
+      title: "平等的",
+      description: "每个成员都是团队的重要一员，我们尊重每个人的声音"
     },
     {
       icon: "Heart",
-      title: "欢乐友爱的团队氛围",
-      description: "温暖的大家庭，每个人都能找到归属感"
+      title: "包容的",
+      description: "接纳不同背景和水平的舞者，共同成长进步"
     },
     {
       icon: "Users",
-      title: "专业的舞蹈指导",
-      description: "经验丰富的导师团队，系统化的教学体系"
+      title: "真诚的",
+      description: "用真心对待每一位成员，建立信任与友谊"
     },
     {
       icon: "Sparkles",
-      title: "丰富的演出机会",
-      description: "校内外各类演出平台，展示自我风采"
+      title: "热烈的",
+      description: "充满激情与活力，用舞蹈点燃生活的热情"
     }
   ] as Feature[],
   
@@ -105,14 +105,21 @@ export const SITE_CONFIG = {
      * 建议尺寸: 1920x1080px (16:9)
      * 用途: 主页顶部全屏背景
      */
-    hero: "/images/hero-bg.jpg",
+    hero: "https://funkandlove-main.s3.bitiful.net/index/hero-bg.jpg",
     
     /**
      * 团队合照
      * 建议尺寸: 800x600px (4:3) 或 1200x800px
      * 用途: 团队介绍区域展示
      */
-    teamPhoto: "/images/team-photo.jpg",
+    teamPhoto: "https://funkandlove-main.s3.bitiful.net/index/team-photo.jpg",
+    
+    /**
+     * 团队特色背景图片
+     * 建议尺寸: 1920x1080px (16:9)
+     * 用途: 团队特色区域右侧背景
+     */
+    featuresBackground: "https://funkandlove-main.s3.bitiful.net/index/features-bg.png",
     
     /**
      * Favicon 图标

@@ -97,7 +97,7 @@ export default function Hero() {
           suggestedSize="1920x1080px (16:9)"
         />
         {/* 深色遮罩层 - 确保文字可读性 */}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/60" />
       </motion.div>
 
       {/* 渐变叠加层 - 中速滚动，鼠标跟随线性渐变，距离控制透明度 */}

@@ -6,14 +6,9 @@ import TeamInfo from "./components/TeamInfo";
 import TeamFeatures from "./components/TeamFeatures";
 import TeamSpirit from "./components/TeamSpirit";
 import SocialLinks from "./components/SocialLinks";
-import CursorGlow from "./components/ui/CursorGlow";
-
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-neutral-900">
-      {/* Global cursor glow effect */}
-      <CursorGlow />
-      
       {/* Fixed navigation */}
       <Navigation />
       
@@ -25,22 +20,22 @@ export default function Home() {
         </section>
         
         {/* Team Info Section */}
-        <section id="team-info" className="py-20 bg-neutral-900">
+        <section id="team-info" className="bg-neutral-900">
           <TeamInfo />
         </section>
         
         {/* Team Features Section */}
-        <section id="features" className="py-20 bg-neutral-900">
+        <section id="features" className="bg-neutral-900">
           <TeamFeatures />
         </section>
         
         {/* Team Spirit Section */}
-        <section id="spirit" className="py-20">
+        <section id="spirit">
           <TeamSpirit />
         </section>
         
         {/* Social Links Footer */}
-        <section id="social" className="py-20 bg-neutral-900">
+        <section id="social" className="bg-neutral-900">
           <SocialLinks />
         </section>
       </main>
