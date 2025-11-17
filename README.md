@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Funk & Love - 官方网站
 
-## Getting Started
+> 浙江大学DFM街舞社Locking团队官方主页
 
-First, run the development server:
+## 项目简介
+
+Funk & Love 是浙江大学 DFM 街舞社的 Locking 团队官方网站。采用现代化的设计和流畅的动画效果，展示团队风采和精神理念。
+
+**Slogan**: Lock it, Point it, Groove it!  
+**理念**: 用舞蹈传递快乐
+
+## 技术栈
+
+- **框架**: Next.js 16 (App Router)
+- **语言**: TypeScript
+- **样式**: Tailwind CSS v4
+- **动画**: Framer Motion
+- **图标**: Lucide React
+- **部署**: Vercel
+
+## 功能特性
+
+- ✨ 现代化响应式设计
+- 🎨 鼠标跟随渐变效果
+- 📜 视差滚动动画
+- 🎭 逐字淡入文字动画
+- 🌈 滚动驱动的背景色变化
+- 📱 移动端优化
+- ⚡ SSR 支持，SEO 友好
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发环境
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+访问 [http://localhost:3000](http://localhost:3000) 查看效果。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 构建生产版本
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 项目结构
 
-To learn more about Next.js, take a look at the following resources:
+```
+funkandlove-index/
+├── app/                    # Next.js App Router
+│   ├── components/         # React 组件
+│   │   ├── ui/            # UI 基础组件
+│   │   ├── Hero.tsx       # 首屏组件
+│   │   ├── Navigation.tsx # 导航栏
+│   │   ├── TeamInfo.tsx   # 团队介绍
+│   │   ├── TeamSpirit.tsx # 团队精神
+│   │   ├── TeamFeatures.tsx # 团队特色
+│   │   └── SocialLinks.tsx # 社交媒体
+│   ├── globals.css        # 全局样式
+│   ├── layout.tsx         # 根布局
+│   └── page.tsx           # 首页
+├── lib/                   # 工具函数
+│   ├── constants.ts       # 常量配置
+│   ├── animations.ts      # 动画配置
+│   └── gradients.ts       # 渐变工具
+├── public/                # 静态资源
+│   └── images/           # 图片资源
+└── package.json          # 项目配置
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 配置说明
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 图片资源
 
-## Deploy on Vercel
+将图片放入 `public/images/` 目录：
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `hero-bg.jpg` - 首屏背景图 (建议尺寸: 1920x1080px)
+- `team-photo.jpg` - 团队合照 (建议尺寸: 1200x800px)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 内容配置
+
+编辑 `lib/constants.ts` 修改：
+- 团队信息
+- 社交媒体链接
+- 导航菜单
+- 团队特色
+
+## 部署
+
+推荐使用 Vercel 部署：
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Hofmann8/funkandlove-index)
+
+## 开发团队
+
+- **开发者**: Hofmann88
+- **团队**: Funk & Love - 浙江大学DFM街舞社Locking团队
+
+## License
+
+MIT License
+
+---
+
+**用舞蹈传递快乐 | Lock it, Point it, Groove it!**
