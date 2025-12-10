@@ -35,9 +35,9 @@ export default function SocialLinks() {
   return (
     <section
       id="social"
-      className="relative py-20 px-4 bg-linear-to-b from-neutral-900 to-black"
+      className="relative min-h-screen flex items-center py-12 px-4 bg-linear-to-b from-neutral-900 to-black"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto w-full">
         {/* 标题 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -170,15 +170,26 @@ export default function SocialLinks() {
         </motion.div>
 
         {/* 底部说明文字 */}
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-center text-neutral-500 text-sm mt-16"
+          className="text-center text-neutral-500 text-sm mt-16 space-y-2"
         >
-          © 2024 Funk & Love. 用舞蹈传递快乐
-        </motion.p>
+          <p>© 2025 Funk & Love. All Rights Reserved.</p>
+          <p>建设者：Hofmann</p>
+          <p>
+            <a
+              href="https://beian.miit.gov.cn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-400 transition-colors"
+            >
+              浙ICP备2025210475号
+            </a>
+          </p>
+        </motion.div>
       </div>
     </section>
   );

@@ -108,7 +108,7 @@ export default function TeamFeatures() {
   return (
     <section
       id="features"
-      className="relative py-12 px-4 overflow-hidden min-h-screen"
+      className="relative py-8 px-4 overflow-hidden min-h-screen flex items-center"
     >
       {/* 背景图片 - 全屏 */}
       <div className="absolute inset-0 z-0">
@@ -124,9 +124,9 @@ export default function TeamFeatures() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10 w-full">
         {/* 左侧内容区域 - 占据 1/3 宽度 */}
-        <div className="w-full lg:w-1/3">
+        <div className="w-full lg:w-2/5">
           {/* 标题 */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}

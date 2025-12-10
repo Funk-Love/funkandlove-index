@@ -1,16 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Funk & Love - 浙江大学DFM街舞社Locking团队",
@@ -36,9 +25,47 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/css/fontawesome.min.css"
+        />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              @font-face {
+                font-family: 'Geist';
+                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/Geist-Regular.woff2') format('woff2');
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+              }
+              @font-face {
+                font-family: 'Geist';
+                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/Geist-Medium.woff2') format('woff2');
+                font-weight: 500;
+                font-style: normal;
+                font-display: swap;
+              }
+              @font-face {
+                font-family: 'Geist';
+                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/Geist-Bold.woff2') format('woff2');
+                font-weight: 700;
+                font-style: normal;
+                font-display: swap;
+              }
+              @font-face {
+                font-family: 'Geist Mono';
+                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/GeistMono-Regular.woff2') format('woff2');
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+              }
+            `,
+          }}
+        />
+      </head>
+      <body className="antialiased">
         {children}
       </body>
     </html>

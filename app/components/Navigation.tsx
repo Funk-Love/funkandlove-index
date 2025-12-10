@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 
 /**
@@ -18,6 +18,7 @@ import { NAV_LINKS } from "@/lib/constants";
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   // 监听滚动，添加毛玻璃背景效果
   useEffect(() => {
@@ -114,25 +115,164 @@ export default function Navigation() {
             </motion.button>
 
             {/* 桌面端导航链接 */}
-            <div className="hidden md:flex items-center space-x-8">
-              {NAV_LINKS.map((link) => (
-                <motion.button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.href)}
-                  className={`text-base font-medium transition-colors relative group ${
-                    isScrolled
-                      ? "text-gray-700 hover:text-purple-600"
-                      : "text-white/90 hover:text-white"
-                  }`}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 0 }}
+            <div className="hidden md:flex items-center space-x-6">
+              {/* 第一组：首页、队伍、历史 */}
+              {NAV_LINKS.filter(link => ['home', 'team', 'history'].includes(link.id)).map((link) => (
+                <div key={link.id} className="relative">
+                  <motion.button
+                    onClick={() => link.href && scrollToSection(link.href)}
+                    className={`text-base font-medium transition-colors relative group ${
+                      isScrolled
+                        ? "text-gray-700 hover:text-purple-600"
+                        : "text-white/90 hover:text-white"
+                    }`}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 0 }}
+                  >
+                    {link.label}
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                      isScrolled ? "bg-purple-600" : "bg-white"
+                    }`} />
+                  </motion.button>
+                </div>
+              ))}
+
+              {/* 分隔线 */}
+              <div className={`w-[1.5px] h-4 rounded-full ${isScrolled ? "bg-gradient-to-b from-purple-400/60 to-pink-400/60" : "bg-gradient-to-b from-white/50 to-white/20"}`} />
+
+              {/* 第二组：计划、活动、云存储 */}
+              {NAV_LINKS.filter(link => ['plan', 'activities', 'cloud'].includes(link.id)).map((link) => (
+                <div 
+                  key={link.id} 
+                  className="relative"
+                  onMouseEnter={() => link.subLinks && setActiveDropdown(link.id)}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  {link.label}
-                  {/* 悬停下划线效果 */}
-                  <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
-                    isScrolled ? "bg-purple-600" : "bg-white"
-                  }`} />
-                </motion.button>
+                  {link.subLinks ? (
+                    // 带下拉菜单的按钮
+                    <motion.button
+                      className={`text-base font-medium transition-colors relative group flex items-center gap-1 ${
+                        isScrolled
+                          ? "text-gray-700 hover:text-purple-600"
+                          : "text-white/90 hover:text-white"
+                      }`}
+                      whileHover={{ y: -2 }}
+                    >
+                      {link.label}
+                      <ChevronDown className="w-4 h-4" />
+                      {/* 悬停下划线效果 */}
+                      <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                        isScrolled ? "bg-purple-600" : "bg-white"
+                      }`} />
+                    </motion.button>
+                  ) : link.url ? (
+                    // 外部链接
+                    <motion.a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`inline-block text-base font-medium transition-colors relative group ${
+                        isScrolled
+                          ? "text-gray-700 hover:text-purple-600"
+                          : "text-white/90 hover:text-white"
+                      }`}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ y: 0 }}
+                    >
+                      {link.label}
+                      {/* 悬停下划线效果 */}
+                      <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                        isScrolled ? "bg-purple-600" : "bg-white"
+                      }`} />
+                    </motion.a>
+                  ) : (
+                    // 普通链接按钮
+                    <motion.button
+                      onClick={() => link.href && scrollToSection(link.href)}
+                      className={`text-base font-medium transition-colors relative group ${
+                        isScrolled
+                          ? "text-gray-700 hover:text-purple-600"
+                          : "text-white/90 hover:text-white"
+                      }`}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ y: 0 }}
+                    >
+                      {link.label}
+                      {/* 悬停下划线效果 */}
+                      <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                        isScrolled ? "bg-purple-600" : "bg-white"
+                      }`} />
+                    </motion.button>
+                  )}
+
+                  {/* 下拉菜单 */}
+                  <AnimatePresence>
+                    {link.subLinks && activeDropdown === link.id && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ 
+                          duration: 0.2,
+                          ease: [0.4, 0, 0.2, 1]
+                        }}
+                        className={`absolute top-full left-0 mt-3 w-64 rounded-xl shadow-2xl overflow-hidden z-50 ${
+                          isScrolled 
+                            ? "bg-white/98 backdrop-blur-lg border border-gray-100" 
+                            : "bg-gray-900/98 backdrop-blur-lg border border-gray-700/50"
+                        }`}
+                      >
+                        {/* 装饰性渐变顶部 */}
+                        <div className={`h-1 ${
+                          isScrolled 
+                            ? "bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" 
+                            : "bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400"
+                        }`} />
+                        
+                        <div className="py-2">
+                          {link.subLinks.map((subLink, index) => (
+                            <motion.a
+                              key={subLink.id}
+                              href={subLink.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                              className={`group flex items-center px-5 py-3.5 font-medium transition-all duration-200 ${
+                                isScrolled
+                                  ? "text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-600"
+                                  : "text-gray-100 hover:bg-gradient-to-r hover:from-purple-900/50 hover:to-pink-900/50 hover:text-white"
+                              }`}
+                              whileHover={{ x: 6 }}
+                            >
+                              {/* 装饰性图标 */}
+                              <span className={`mr-3 text-lg transition-transform group-hover:scale-110 ${
+                                isScrolled ? "text-purple-500" : "text-purple-400"
+                              }`}>
+                                {subLink.icon || "📌"}
+                              </span>
+                              
+                              <span className="flex-1">{subLink.label}</span>
+                              
+                              {/* 箭头指示器 */}
+                              <svg 
+                                className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
+                                  isScrolled ? "text-purple-400" : "text-purple-300"
+                                }`}
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </motion.a>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ))}
             </div>
 
@@ -201,7 +341,8 @@ export default function Navigation() {
               {/* 侧边栏导航链接 */}
               <nav className="p-6">
                 <ul className="space-y-2">
-                  {NAV_LINKS.map((link, index) => (
+                  {/* 第一组：首页、队伍、历史 */}
+                  {NAV_LINKS.filter(link => ['home', 'team', 'history'].includes(link.id)).map((link, index) => (
                     <motion.li
                       key={link.id}
                       initial={{ opacity: 0, x: 20 }}
@@ -212,7 +353,7 @@ export default function Navigation() {
                       }}
                     >
                       <motion.button
-                        onClick={() => scrollToSection(link.href)}
+                        onClick={() => link.href && scrollToSection(link.href)}
                         className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                         whileHover={{ x: 8 }}
                         whileTap={{ scale: 0.98 }}
@@ -220,6 +361,95 @@ export default function Navigation() {
                       >
                         {link.label}
                       </motion.button>
+                    </motion.li>
+                  ))}
+
+                  {/* 分隔线 */}
+                  <li className="py-2">
+                    <div className="h-px bg-gray-200 mx-4" />
+                  </li>
+
+                  {/* 第二组：计划、活动、云存储 */}
+                  {NAV_LINKS.filter(link => ['plan', 'activities', 'cloud'].includes(link.id)).map((link, index) => (
+                    <motion.li
+                      key={link.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        delay: index * 0.1,
+                        duration: 0.3 
+                      }}
+                    >
+                      {link.subLinks ? (
+                        // 带子菜单的项
+                        <div>
+                          <motion.button
+                            onClick={() => setActiveDropdown(activeDropdown === link.id ? null : link.id)}
+                            className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center justify-between"
+                            whileHover={{ x: 8 }}
+                            whileTap={{ scale: 0.98 }}
+                            style={{ minHeight: "44px", minWidth: "44px" }}
+                          >
+                            {link.label}
+                            <ChevronDown 
+                              className={`w-5 h-5 transition-transform ${
+                                activeDropdown === link.id ? "rotate-180" : ""
+                              }`} 
+                            />
+                          </motion.button>
+                          <AnimatePresence>
+                            {activeDropdown === link.id && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pl-4 pt-2 space-y-1">
+                                  {link.subLinks.map((subLink) => (
+                                    <motion.a
+                                      key={subLink.id}
+                                      href={subLink.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block px-4 py-2 text-base text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                                      whileHover={{ x: 4 }}
+                                      style={{ minHeight: "44px" }}
+                                    >
+                                      {subLink.label}
+                                    </motion.a>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ) : link.url ? (
+                        // 外部链接项
+                        <motion.a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                          whileHover={{ x: 8 }}
+                          whileTap={{ scale: 0.98 }}
+                          style={{ minHeight: "44px", minWidth: "44px" }}
+                        >
+                          {link.label}
+                        </motion.a>
+                      ) : (
+                        // 普通链接项
+                        <motion.button
+                          onClick={() => link.href && scrollToSection(link.href)}
+                          className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                          whileHover={{ x: 8 }}
+                          whileTap={{ scale: 0.98 }}
+                          style={{ minHeight: "44px", minWidth: "44px" }}
+                        >
+                          {link.label}
+                        </motion.button>
+                      )}
                     </motion.li>
                   ))}
                 </ul>

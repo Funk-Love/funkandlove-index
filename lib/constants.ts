@@ -20,12 +20,24 @@ export interface Feature {
 }
 
 /**
+ * 活动子菜单配置
+ */
+export interface ActivitySubLink {
+  id: string;
+  label: string;
+  url: string;
+  icon?: string; // emoji 图标
+}
+
+/**
  * 导航链接配置
  */
 export interface NavLink {
   id: string;
   label: string;
-  href: string;
+  href?: string;
+  url?: string;
+  subLinks?: ActivitySubLink[];
 }
 
 /**
@@ -51,7 +63,7 @@ export const SITE_CONFIG = {
     {
       icon: "Scale",
       title: "平等的",
-      description: "每个成员都是团队的重要一员，我们尊重每个人的声音"
+      description: "我们尊重每个队员的声音"
     },
     {
       icon: "Heart",
@@ -149,18 +161,47 @@ export const NAV_LINKS: NavLink[] = [
     href: "#hero" 
   },
   { 
-    id: "about", 
-    label: "团队介绍", 
-    href: "#team-info" 
+    id: "plan", 
+    label: "计划", 
+    href: "#under-construction" 
   },
   { 
-    id: "features", 
-    label: "团队特色", 
-    href: "#features" 
+    id: "team", 
+    label: "队伍", 
+    href: "#under-construction" 
   },
   { 
-    id: "contact", 
-    label: "联系我们", 
-    href: "#social" 
+    id: "activities", 
+    label: "活动",
+    subLinks: [
+      {
+        id: "halloween",
+        label: "万圣节特别活动",
+        url: "https://activities.funk-and.love/activities/2025/halloween-club/index.html",
+        icon: "🎃"
+      },
+      {
+        id: "xiaoming",
+        label: "小明大师课",
+        url: "https://activities.funk-and.love/activities/2025/xiaoming-masterclass/index.html",
+        icon: "🎯"
+      },
+      {
+        id: "funk-you-up",
+        label: "2025快闪",
+        url: "https://activities.funk-and.love/activities/2025/funk-you-up/index.html",
+        icon: "⚡"
+      }
+    ]
+  },
+  { 
+    id: "history", 
+    label: "历史", 
+    href: "#under-construction" 
+  },
+  { 
+    id: "cloud", 
+    label: "云存储", 
+    url: "https://cloud.funk-and.love" 
   }
 ];

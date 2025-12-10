@@ -48,27 +48,27 @@ export default function TeamInfo() {
     <section
       id="team-info"
       ref={ref}
-      className="relative py-20 md:py-32 px-4 overflow-hidden"
+      className="relative min-h-screen flex items-center py-12 md:py-16 px-4 overflow-hidden"
     >
       {/* 背景装饰 */}
       <div className="absolute inset-0 bg-linear-to-b from-neutral-50 to-white -z-10" />
       
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto w-full">
         {/* 区域标题 */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8 lg:mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 mb-3">
             关于我们
           </h2>
-          <div className="w-20 h-1 bg-linear-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
+          <div className="w-16 lg:w-20 h-1 bg-linear-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
         </motion.div>
 
         {/* 两栏布局 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* 左侧：团队照片 */}
           <motion.div
             initial="initial"

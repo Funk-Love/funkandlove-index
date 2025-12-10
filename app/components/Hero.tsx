@@ -127,11 +127,29 @@ export default function Hero() {
         className="relative z-20 container mx-auto px-4 text-center"
         style={{ y: contentY }}
       >
+        {/* Logo - 从下方滑入 + 淡入 */}
+        <motion.div
+          variants={fadeInUp}
+          initial="initial"
+          animate="animate"
+          className="mb-8 flex justify-center"
+        >
+          <img
+            src="https://funkandlove-main.s3.bitiful.net/public/icon.png"
+            alt="Funk & Love Logo"
+            className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
+            style={{
+              filter: 'drop-shadow(0 0 40px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 80px rgba(236, 72, 153, 0.6))',
+            }}
+          />
+        </motion.div>
+
         {/* 标题 - 从下方滑入 + 淡入 */}
         <motion.h1
           variants={fadeInUp}
           initial="initial"
           animate="animate"
+          transition={{ delay: 0.2, duration: 0.6 }}
           className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-6"
           style={{
             textShadow: '0 0 40px rgba(139, 92, 246, 0.8), 0 0 80px rgba(236, 72, 153, 0.6)',
@@ -145,7 +163,7 @@ export default function Hero() {
           variants={fadeInUp}
           initial="initial"
           animate="animate"
-          transition={{ delay: 0.3, duration: 0.6 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
           className="text-2xl md:text-4xl lg:text-5xl font-light italic text-white mb-8"
           style={{
             textShadow: '0 0 20px rgba(255, 255, 255, 0.5)',
@@ -159,26 +177,13 @@ export default function Hero() {
           variants={fadeInUp}
           initial="initial"
           animate="animate"
-          transition={{ delay: 0.6, duration: 0.6 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
           className="text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto"
           style={{
             textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
           }}
         >
           {SITE_CONFIG.description}
-        </motion.p>
-        
-        <motion.p
-          variants={fadeInUp}
-          initial="initial"
-          animate="animate"
-          transition={{ delay: 0.9, duration: 0.6 }}
-          className="text-base md:text-lg text-white/80 max-w-2xl mx-auto mt-4"
-          style={{
-            textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          {SITE_CONFIG.philosophy}
         </motion.p>
       </motion.div>
 
