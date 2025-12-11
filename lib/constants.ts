@@ -113,11 +113,11 @@ export const SITE_CONFIG = {
   // 图片路径配置
   images: {
     /**
-     * Hero 背景图片
-     * 建议尺寸: 1920x1080px (16:9)
-     * 用途: 主页顶部全屏背景
+     * Hero 背景图片（使用团队合照）
+     * 建议尺寸: 6000x4000px
+     * 用途: 主页顶部全屏背景，与Team section共用同一张图
      */
-    hero: "https://funkandlove-main.s3.bitiful.net/index/hero-bg.jpg",
+    hero: "https://funkandlove-main.s3.bitiful.net/index/team-bg.jpg",
     
     /**
      * 团队合照

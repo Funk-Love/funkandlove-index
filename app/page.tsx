@@ -4,21 +4,26 @@ import { useState, useEffect } from "react";
 import Navigation from "./components/Navigation";
 import Hero from "./components/Hero";
 import TeamInfo from "./components/TeamInfo";
+import Team from "./components/Team";
 import TeamFeatures from "./components/TeamFeatures";
 import TeamSpirit from "./components/TeamSpirit";
-import History from "./components/History";
+import Leaders from "./components/Leaders";
+import Members from "./components/Members";
 import SocialLinks from "./components/SocialLinks";
 import MobileView from "./components/MobileView";
 import SectionIndicator from "./components/SectionIndicator";
+import TeamPhotoBackground from "./components/TeamPhotoBackground";
 import { useSnapScroll } from "./hooks/useSnapScroll";
 
 // 定义所有 section 的 ID
 const SECTION_IDS = [
   'hero',
   'team-info',
+  'team',
   'features',
   'team-spirit',
-  'history',
+  'leaders',
+  'members',
   'social',
 ];
 
@@ -57,6 +62,9 @@ export default function Home() {
   // 桌面端显示完整版本
   return (
     <div className="relative bg-neutral-900">
+      {/* 共享的团队照片背景层 */}
+      <TeamPhotoBackground />
+      
       {/* Fixed navigation */}
       <Navigation />
       
@@ -79,6 +87,11 @@ export default function Home() {
           <TeamInfo />
         </section>
         
+        {/* Team Section - 团队合照交互 */}
+        <section id="team" className="snap-section">
+          <Team />
+        </section>
+        
         {/* Team Features Section - 全屏 */}
         <section id="features" className="snap-section bg-neutral-900">
           <TeamFeatures />
@@ -89,9 +102,14 @@ export default function Home() {
           <TeamSpirit />
         </section>
         
-        {/* History Section - 滚动驱动横向滚动 */}
-        <div id="history">
-          <History />
+        {/* Leaders Section - 滚动驱动横向滚动 */}
+        <div id="leaders">
+          <Leaders />
+        </div>
+        
+        {/* Members Section - 时间线滚动 */}
+        <div id="members">
+          <Members />
         </div>
         
         {/* Social Links Footer - 全屏 */}

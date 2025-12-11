@@ -59,9 +59,11 @@ function getSectionLabel(id: string): string {
   const labels: Record<string, string> = {
     'hero': '首页',
     'team-info': '关于我们',
+    'team': '团队',
     'features': '团队特色',
     'team-spirit': '团队精神',
-    'history': '历史',
+    'leaders': '历年队长',
+    'members': '历年成员',
     'social': '关注我们',
   };
   return labels[id] || id;
