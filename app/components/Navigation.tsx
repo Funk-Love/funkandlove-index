@@ -5,6 +5,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 
+// Toast 组件
+function Toast({ message, onClose }: { message: string; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 2000); // 2秒后自动关闭
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只在挂载时启动定时器，不依赖 onClose
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-black/90 backdrop-blur-md text-white rounded-xl shadow-2xl border border-white/10"
+    >
+      <p className="text-sm font-medium">{message}</p>
+    </motion.div>
+  );
+}
+
 /**
  * Navigation Component
  * 
@@ -19,6 +39,12 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // 显示 toast 提示
+  const showToast = (message: string) => {
+    setToastMessage(message);
+  };
 
   // 监听滚动，添加毛玻璃背景效果
   useEffect(() => {
@@ -48,6 +74,13 @@ export default function Navigation() {
 
   return (
     <>
+      {/* Toast 提示 */}
+      <AnimatePresence>
+        {toastMessage && (
+          <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+        )}
+      </AnimatePresence>
+
       {/* 固定导航栏 */}
       <motion.nav
         initial={{ y: -100 }}
@@ -188,7 +221,13 @@ export default function Navigation() {
                   ) : (
                     // 普通链接按钮
                     <motion.button
-                      onClick={() => link.href && scrollToSection(link.href)}
+                      onClick={() => {
+                        if (link.id === 'plan') {
+                          showToast('Funk&Love训练计划功能还在制作中，预计在下个大版本加入');
+                        } else if (link.href) {
+                          scrollToSection(link.href);
+                        }
+                      }}
                       className={`text-base font-medium transition-colors relative group ${
                         isScrolled
                           ? "text-gray-700 hover:text-purple-600"
@@ -441,7 +480,14 @@ export default function Navigation() {
                       ) : (
                         // 普通链接项
                         <motion.button
-                          onClick={() => link.href && scrollToSection(link.href)}
+                          onClick={() => {
+                            if (link.id === 'plan') {
+                              showToast('Funk&Love训练计划功能还在制作中，预计在下个大版本加入');
+                              setIsMobileMenuOpen(false);
+                            } else if (link.href) {
+                              scrollToSection(link.href);
+                            }
+                          }}
                           className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                           whileHover={{ x: 8 }}
                           whileTap={{ scale: 0.98 }}

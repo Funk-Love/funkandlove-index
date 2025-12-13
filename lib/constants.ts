@@ -168,7 +168,7 @@ export const NAV_LINKS: NavLink[] = [
   { 
     id: "team", 
     label: "队伍", 
-    href: "#under-construction" 
+    href: "#team" 
   },
   { 
     id: "activities", 
@@ -197,7 +197,7 @@ export const NAV_LINKS: NavLink[] = [
   { 
     id: "history", 
     label: "历史", 
-    href: "#under-construction" 
+    href: "#leaders" 
   },
   { 
     id: "cloud", 

@@ -30,39 +30,26 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/css/fontawesome.min.css"
         />
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              @font-face {
-                font-family: 'Geist';
-                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/Geist-Regular.woff2') format('woff2');
-                font-weight: 400;
-                font-style: normal;
-                font-display: swap;
-              }
-              @font-face {
-                font-family: 'Geist';
-                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/Geist-Medium.woff2') format('woff2');
-                font-weight: 500;
-                font-style: normal;
-                font-display: swap;
-              }
-              @font-face {
-                font-family: 'Geist';
-                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/Geist-Bold.woff2') format('woff2');
-                font-weight: 700;
-                font-style: normal;
-                font-display: swap;
-              }
-              @font-face {
-                font-family: 'Geist Mono';
-                src: url('https://lf3-cdn-tos.bytecdntp.com/cdn/expire-100-M/geist/1.0.0/GeistMono-Regular.woff2') format('woff2');
-                font-weight: 400;
-                font-style: normal;
-                font-display: swap;
-              }
-            `,
-          }}
+        {/* Inter 字体 - 字节镜像 */}
+        <link
+          rel="preconnect"
+          href="https://fonts.bytedance.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.bytedance.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        />
+        {/* 预加载关键图片 */}
+        <link
+          rel="preload"
+          as="image"
+          href="https://funkandlove-main.s3.bitiful.net/index/team-bg.jpg"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="https://funkandlove-main.s3.bitiful.net/public/icon.png"
         />
       </head>
       <body className="antialiased">

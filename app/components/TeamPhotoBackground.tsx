@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 const IMAGE_URL = "https://funkandlove-main.s3.bitiful.net/index/team-bg.jpg";
 
 /**
@@ -9,12 +11,13 @@ const IMAGE_URL = "https://funkandlove-main.s3.bitiful.net/index/team-bg.jpg";
 export default function TeamPhotoBackground() {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      <img
+      <Image
         src={IMAGE_URL}
         alt="Funk & Love 团队合照"
-        className="w-full h-full object-cover object-center"
-        loading="eager"
-        decoding="async"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center"
       />
     </div>
   );

@@ -49,6 +49,8 @@ export function useSnapScroll({
     if (!element) return;
 
     isScrolling.current = true;
+    // 立即更新 index，让导航指示器同步开始动画
+    setCurrentIndex(index);
     
     let targetY: number;
     if (scrollToEnd) {
@@ -59,10 +61,7 @@ export function useSnapScroll({
     }
     
     smoothScrollTo(targetY, () => {
-      setCurrentIndex(index);
-      setTimeout(() => {
-        isScrolling.current = false;
-      }, 100);
+      isScrolling.current = false;
     });
   }, [sectionIds, smoothScrollTo]);
 
@@ -101,7 +100,8 @@ export function useSnapScroll({
     return getCurrentSectionIndex();
   }, [sectionIds, getCurrentSectionIndex]);
 
-  const scrollableSections = ['leaders', 'members'];
+  // 可以自由滚动的 section（不是 snap 到顶部）
+  const scrollableSections = useRef(['leaders', 'members']).current;
 
   // 检查是否在可滚动 section 中间
   const isInScrollableSectionMiddle = useCallback((delta: number): boolean => {
@@ -128,7 +128,7 @@ export function useSnapScroll({
       return true;
     }
     return false;
-  }, []);
+  }, [scrollableSections]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     if (!enabled) return;
@@ -178,7 +178,7 @@ export function useSnapScroll({
     const shouldScrollToEnd = isScrollingUp && scrollableSections.includes(targetSectionId);
     
     scrollToSection(targetIndex, shouldScrollToEnd);
-  }, [enabled, threshold, sectionIds, getCurrentSectionIndex, getContainingSectionIndex, scrollToSection, isInScrollableSectionMiddle]);
+  }, [enabled, isInScrollableSectionMiddle, threshold, getContainingSectionIndex, getCurrentSectionIndex, sectionIds, scrollableSections, scrollToSection]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!enabled || isScrolling.current) return;
@@ -199,10 +199,14 @@ export function useSnapScroll({
     }
   }, [enabled, sectionIds.length, getCurrentSectionIndex, scrollToSection]);
 
+  // 程序控制的滚动已经在 scrollToSection 里立即设置了正确的 index
+  // 这里只处理非程序控制的情况（基本不会发生，因为 wheel 事件被拦截了）
   const handleScroll = useCallback(() => {
+    // 程序控制滚动时不更新，避免覆盖已设置的目标 index
     if (isScrolling.current) return;
-    setCurrentIndex(getCurrentSectionIndex());
-  }, [getCurrentSectionIndex]);
+    // 在可滚动区域内自由滚动时，index 不需要变化（用户还在同一个 section）
+    // 所以这里什么都不做
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
