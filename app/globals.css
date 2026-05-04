@@ -10,16 +10,16 @@
   --primary-purple: #8b5cf6;
   --primary-orange: #f59e0b;
   --primary-blue: #3b82f6;
-  
+
   /* Accent Colors - 强调色 */
   --accent-pink: #ec4899;
   --accent-green: #10b981;
-  
+
   /* Neutral Colors - 中性色 */
   --neutral-900: #111827;
   --neutral-100: #f3f4f6;
   --neutral-white: #ffffff;
-  
+
   /* Spacing Scale */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -30,26 +30,26 @@
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  
+
   /* Blur Effects */
   --blur-sm: 4px;
   --blur-md: 8px;
   --blur-lg: 16px;
-  
+
   /* Border Radius */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
-  
+
   /* Font Weights */
   --font-light: 300;
   --font-normal: 400;
@@ -93,6 +93,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -107,7 +108,8 @@ body {
   display: none;
 }
 
-html, body {
+html,
+body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -187,7 +189,8 @@ img {
 /* Snap Section - 全屏 section 样式 */
 .snap-section {
   min-height: 100vh;
-  min-height: 100dvh; /* 动态视口高度，适配移动端地址栏 */
+  min-height: 100dvh;
+  /* 动态视口高度，适配移动端地址栏 */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -213,7 +216,7 @@ html {
 }
 
 /* 响应式全屏 section 内容居中 */
-.snap-section > * {
+.snap-section>* {
   width: 100%;
 }
 

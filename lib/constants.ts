@@ -1,4 +1,4 @@
-import { LucideIcon, Video, MessageCircle, Tv, Instagram } from "lucide-react";
+import { LucideIcon, Video, MessageCircle, Tv, Instagram, Ghost, Target, Zap, Cloud, Bot, Shirt } from "lucide-react";
 
 /**
  * 社交媒体链接配置
@@ -26,7 +26,7 @@ export interface ActivitySubLink {
   id: string;
   label: string;
   url: string;
-  icon?: string; // emoji 图标
+  icon?: LucideIcon;
 }
 
 /**
@@ -178,19 +178,19 @@ export const NAV_LINKS: NavLink[] = [
         id: "halloween",
         label: "万圣节特别活动",
         url: "https://activities.funk-and.love/activities/2025/halloween-club/index.html",
-        icon: "🎃"
+        icon: Ghost
       },
       {
         id: "xiaoming",
         label: "小明大师课",
         url: "https://activities.funk-and.love/activities/2025/xiaoming-masterclass/index.html",
-        icon: "🎯"
+        icon: Target
       },
       {
         id: "funk-you-up",
         label: "2025快闪",
         url: "https://activities.funk-and.love/activities/2025/funk-you-up/index.html",
-        icon: "⚡"
+        icon: Zap
       }
     ]
   },
@@ -199,9 +199,34 @@ export const NAV_LINKS: NavLink[] = [
     label: "历史", 
     href: "#leaders" 
   },
-  { 
-    id: "cloud", 
-    label: "云存储", 
-    url: "https://cloud.funk-and.love" 
+  {
+    id: "merch",
+    label: "周边",
+    subLinks: [
+      {
+        id: "jersey2026",
+        label: "2026队服",
+        url: "https://merch.funk-and.love/jersey2026/",
+        icon: Shirt
+      }
+    ]
+  },
+  {
+    id: "products",
+    label: "产品",
+    subLinks: [
+      {
+        id: "lockcloud",
+        label: "LockCloud",
+        url: "https://cloud.funk-and.love",
+        icon: Cloud
+      },
+      {
+        id: "lockai",
+        label: "LockAI",
+        url: "https://ai.funk-and.love",
+        icon: Bot
+      }
+    ]
   }
 ];

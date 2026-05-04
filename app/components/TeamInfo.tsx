@@ -48,11 +48,11 @@ export default function TeamInfo() {
     <section
       id="team-info"
       ref={ref}
-      className="relative min-h-screen flex items-center py-12 md:py-16 px-4 overflow-hidden"
+      className="relative min-h-screen flex items-start pt-[12vh] pb-12 md:pt-[10vh] md:pb-16 px-4 overflow-hidden"
     >
       {/* 背景装饰 */}
       <div className="absolute inset-0 bg-linear-to-b from-neutral-50 to-white -z-10" />
-      
+
       <div className="max-w-7xl mx-auto w-full">
         {/* 区域标题 */}
         <motion.div
@@ -86,7 +86,7 @@ export default function TeamInfo() {
                 suggestedSize="1200x800px"
                 placeholderText="团队合照待补充"
               />
-              
+
               {/* 装饰元素 */}
               <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-linear-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-2xl -z-10" />
               <div className="absolute -top-6 -left-6 w-40 h-40 bg-linear-to-br from-orange-500/20 to-blue-500/20 rounded-full blur-2xl -z-10" />
@@ -124,15 +124,14 @@ export default function TeamInfo() {
                   className="group relative bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 border border-neutral-100"
                 >
                   {/* 图标 */}
-                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg bg-linear-to-br ${
-                    item.color === 'text-purple-500' ? 'from-purple-100 to-purple-50' :
-                    item.color === 'text-orange-500' ? 'from-orange-100 to-orange-50' :
-                    item.color === 'text-blue-500' ? 'from-blue-100 to-blue-50' :
-                    'from-pink-100 to-pink-50'
-                  } mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg bg-linear-to-br ${item.color === 'text-purple-500' ? 'from-purple-100 to-purple-50' :
+                      item.color === 'text-orange-500' ? 'from-orange-100 to-orange-50' :
+                        item.color === 'text-blue-500' ? 'from-blue-100 to-blue-50' :
+                          'from-pink-100 to-pink-50'
+                    } mb-3 group-hover:scale-110 transition-transform duration-300`}>
                     <item.icon className={`w-6 h-6 ${item.color}`} />
                   </div>
-                  
+
                   {/* 标签和值 */}
                   <div>
                     <p className="text-sm text-neutral-500 mb-1">{item.label}</p>

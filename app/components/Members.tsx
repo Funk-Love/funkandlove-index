@@ -47,7 +47,7 @@ function useBodyScrollLock(isLocked: boolean) {
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
-      
+
       return () => {
         document.body.style.position = '';
         document.body.style.top = '';
@@ -144,6 +144,7 @@ const GENERATIONS: GenerationData[] = [
     year: "2025",
     members: [
       { name: "bc", image: buildMemberImageUrl("25届", "bc") },
+      { name: "Hofmann", image: buildMemberImageUrl("25届", "Hofmann") },
       { name: "乙烯", image: buildMemberImageUrl("25届", "乙烯") },
       { name: "姜姜", image: buildMemberImageUrl("25届", "姜姜") },
       { name: "小咩", image: buildMemberImageUrl("25届", "小咩") },
@@ -190,7 +191,7 @@ function MembersModal({
       >
         {/* 顶部渐变装饰 */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
-        
+
         {/* 关闭按钮 */}
         <button
           onClick={onClose}
@@ -272,23 +273,21 @@ function TimelineNode({
 }) {
   const isCollecting = generation.isCollecting;
   const memberCount = generation.members.length;
-  
+
   return (
     <div
-      className={`relative flex items-start gap-6 group transition-all duration-500 ${
-        isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
-      }`}
+      className={`relative flex items-start gap-6 group transition-all duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+        }`}
       style={{ transitionDelay: `${index * 80}ms` }}
     >
       {/* 时间线 */}
       <div className="flex flex-col items-center">
         {/* 节点圆点 - 移除无限脉冲动画 */}
         <div
-          className={`relative z-10 w-5 h-5 rounded-full border-2 transition-all duration-300 hover:scale-125 ${
-            isCollecting
+          className={`relative z-10 w-5 h-5 rounded-full border-2 transition-all duration-300 hover:scale-125 ${isCollecting
               ? "border-gray-500 bg-neutral-800"
               : "border-purple-500 bg-purple-500/20 group-hover:bg-purple-500 group-hover:shadow-lg group-hover:shadow-purple-500/50"
-          }`}
+            }`}
         />
         {/* 连接线 */}
         {!isLast && (
@@ -299,22 +298,20 @@ function TimelineNode({
       {/* 内容卡片 - 使用 CSS hover 代替 motion */}
       <div
         onClick={onClick}
-        className={`flex-1 cursor-pointer rounded-2xl p-6 transition-all duration-300 border hover:translate-x-2 ${
-          isCollecting
+        className={`flex-1 cursor-pointer rounded-2xl p-6 transition-all duration-300 border hover:translate-x-2 ${isCollecting
             ? "bg-neutral-800/30 border-gray-700/50 hover:border-gray-600"
             : "bg-neutral-800/50 border-white/5 hover:border-purple-500/50 hover:bg-neutral-800/80 hover:shadow-xl hover:shadow-purple-500/10"
-        }`}
+          }`}
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <span className={`text-2xl font-bold ${isCollecting ? "text-gray-500" : "text-white"}`}>
               {generation.term}
             </span>
-            <span className={`text-sm px-3 py-1 rounded-full ${
-              isCollecting 
-                ? "bg-gray-700/50 text-gray-500" 
+            <span className={`text-sm px-3 py-1 rounded-full ${isCollecting
+                ? "bg-gray-700/50 text-gray-500"
                 : "bg-purple-500/20 text-purple-300"
-            }`}>
+              }`}>
               {generation.year}
             </span>
           </div>
@@ -338,9 +335,8 @@ function TimelineNode({
               {generation.members.slice(0, 6).map((member, idx) => (
                 <div
                   key={member.name}
-                  className={`relative w-10 h-10 rounded-full overflow-hidden border-2 border-neutral-900 bg-neutral-700 transition-all duration-300 ${
-                    isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-                  }`}
+                  className={`relative w-10 h-10 rounded-full overflow-hidden border-2 border-neutral-900 bg-neutral-700 transition-all duration-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                    }`}
                   style={{ zIndex: 10 - idx, transitionDelay: `${(index * 80) + (idx * 50)}ms` }}
                 >
                   <img
@@ -373,11 +369,11 @@ function TimelineNode({
 export default function Members() {
   const [selectedGeneration, setSelectedGeneration] = useState<GenerationData | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  
+
   // 弹窗打开时锁定 body 滚动
   useBodyScrollLock(selectedGeneration !== null);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // 使用 IntersectionObserver 代替 useScroll，大幅减少计算
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -386,11 +382,11 @@ export default function Members() {
       },
       { threshold: 0.1 }
     );
-    
+
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -398,7 +394,7 @@ export default function Members() {
     <>
       <section
         ref={containerRef}
-        className="relative min-h-screen bg-neutral-900 py-24 overflow-hidden"
+        className="relative min-h-screen bg-neutral-900 pt-[12vh] pb-24 md:pt-[10vh] overflow-hidden"
       >
         {/* 背景装饰 - 减小尺寸和模糊程度 */}
         <div className="absolute inset-0 pointer-events-none">
@@ -409,9 +405,8 @@ export default function Members() {
         <div className={`relative z-10 max-w-4xl mx-auto px-8 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           {/* 标题 - 使用 CSS 动画代替 motion */}
           <div
-            className={`text-center mb-16 transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+            className={`text-center mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
           >
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">
               历年成员

@@ -108,7 +108,7 @@ export default function TeamFeatures() {
   return (
     <section
       id="features"
-      className="relative py-8 px-4 overflow-hidden min-h-screen flex items-center"
+      className="relative pt-[12vh] pb-8 md:pt-[10vh] px-4 overflow-hidden min-h-screen flex items-center"
     >
       {/* 背景图片 - 全屏 */}
       <div className="absolute inset-0 z-0">

@@ -35,7 +35,7 @@ export default function SocialLinks() {
   return (
     <section
       id="social"
-      className="relative min-h-screen flex items-center py-12 px-4 bg-linear-to-b from-neutral-900 to-black"
+      className="relative min-h-screen flex items-center pt-[12vh] pb-12 md:pt-[10vh] px-4 bg-linear-to-b from-neutral-900 to-black"
     >
       <div className="max-w-7xl mx-auto w-full">
         {/* 标题 */}

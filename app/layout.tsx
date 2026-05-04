@@ -13,8 +13,8 @@ export const metadata: Metadata = {
     type: "website",
   },
   icons: {
-    icon: "https://funkandlove-main.s3.bitiful.net/public/favicon.ico",
-    apple: "https://funkandlove-main.s3.bitiful.net/public/icon.png",
+    icon: "/favicon.ico",
+    apple: "/icon.png",
   },
 };
 

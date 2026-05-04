@@ -185,7 +185,7 @@ export default function MobileView() {
                                   className="flex items-center justify-between w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-lg text-white/90 transition-all duration-200"
                                 >
                                   <span className="flex items-center gap-2 text-sm">
-                                    <span>{subLink.icon || "📌"}</span>
+                                    {subLink.icon && <subLink.icon className="w-4 h-4" />}
                                     {subLink.label}
                                   </span>
                                   <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-60" />

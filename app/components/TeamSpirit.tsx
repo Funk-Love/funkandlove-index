@@ -16,13 +16,13 @@ import { SITE_CONFIG } from "@/lib/constants";
  */
 export default function TeamSpirit() {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // 滚动驱动渐变背景
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
-  
+
   // 背景色根据滚动位置在多个颜色间平滑过渡
   const backgroundColor = useTransform(
     scrollYProgress,
@@ -35,22 +35,22 @@ export default function TeamSpirit() {
       "#10b981"  // 绿色
     ]
   );
-  
+
   // 将 Slogan 拆分为单个字符用于逐字动画
   const sloganChars = SITE_CONFIG.slogan.split("");
   const philosophyChars = SITE_CONFIG.philosophy.split("");
-  
+
   return (
     <motion.section
       ref={containerRef}
       id="team-spirit"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden py-20 px-4"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-[12vh] pb-20 md:pt-[10vh] px-4"
       style={{
         backgroundColor
       }}
     >
 
-      
+
       {/* 内容容器 */}
       <div className="relative z-20 max-w-5xl mx-auto text-center">
         {/* Slogan - 逐字淡入动画 */}
@@ -80,13 +80,13 @@ export default function TeamSpirit() {
                 color: "#ffffff"
               }}
               variants={{
-                hidden: { 
-                  opacity: 0, 
+                hidden: {
+                  opacity: 0,
                   y: 20,
                   filter: "blur(10px)"
                 },
-                visible: { 
-                  opacity: 1, 
+                visible: {
+                  opacity: 1,
                   y: 0,
                   filter: "blur(0px)",
                   transition: {
@@ -100,7 +100,7 @@ export default function TeamSpirit() {
             </motion.span>
           ))}
         </motion.h2>
-        
+
         {/* 分隔线 */}
         <motion.div
           className="w-32 h-1 mx-auto mb-8 rounded-full"
@@ -113,7 +113,7 @@ export default function TeamSpirit() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.5 }}
         />
-        
+
         {/* 团队理念 - 逐字淡入动画 */}
         <motion.p
           className="text-2xl md:text-4xl lg:text-5xl font-light tracking-wide"
@@ -141,13 +141,13 @@ export default function TeamSpirit() {
                 color: "#ffffff"
               }}
               variants={{
-                hidden: { 
-                  opacity: 0, 
+                hidden: {
+                  opacity: 0,
                   y: 15,
                   filter: "blur(8px)"
                 },
-                visible: { 
-                  opacity: 1, 
+                visible: {
+                  opacity: 1,
                   y: 0,
                   filter: "blur(0px)",
                   transition: {
@@ -161,7 +161,7 @@ export default function TeamSpirit() {
             </motion.span>
           ))}
         </motion.p>
-        
+
         {/* 装饰性元素 - 脉动光圈 */}
         <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none -z-10"

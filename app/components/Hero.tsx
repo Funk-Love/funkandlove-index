@@ -14,59 +14,59 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(true); // 默认为移动端，避免水合不匹配
   const [isMounted, setIsMounted] = useState(false); // 追踪是否已挂载
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // 检测是否为移动设备
   useLayoutEffect(() => {
     setIsMounted(true); // 标记为已挂载
-    
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
   // 视差滚动效果（仅用于内容和渐变层）
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
-  
+
   // 内容滚动速度
   const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  
+
   // 渐变层滚动速度
   const gradientY = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
-  
+
   // 计算从容器中心到鼠标的角度和距离（仅在客户端挂载后计算）
-  const { gradientAngle, distanceOpacity } = isMounted && typeof window !== 'undefined' 
+  const { gradientAngle, distanceOpacity } = isMounted && typeof window !== 'undefined'
     ? (() => {
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        const deltaX = mousePosition.x - centerX;
-        const deltaY = mousePosition.y - centerY;
-        
-        // 计算角度（弧度转角度）
-        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-        
-        // 计算距离（归一化到 0-1）
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
-        const normalizedDistance = Math.min(distance / maxDistance, 1);
-        
-        // 距离越近透明度越低（越看不见），距离越远透明度越高（越明显）
-        const opacity = normalizedDistance;
-        
-        return { 
-          gradientAngle: angle + 90, 
-          distanceOpacity: opacity 
-        };
-      })()
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const deltaX = mousePosition.x - centerX;
+      const deltaY = mousePosition.y - centerY;
+
+      // 计算角度（弧度转角度）
+      const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+      // 计算距离（归一化到 0-1）
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+      const normalizedDistance = Math.min(distance / maxDistance, 1);
+
+      // 距离越近透明度越低（越看不见），距离越远透明度越高（越明显）
+      const opacity = normalizedDistance;
+
+      return {
+        gradientAngle: angle + 90,
+        distanceOpacity: opacity
+      };
+    })()
     : { gradientAngle: 135, distanceOpacity: 1 }; // SSR 默认值
-  
+
   // 平滑滚动到下一个区域
   const scrollToNext = () => {
     const nextSection = document.getElementById('team-info');
@@ -85,7 +85,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0 bg-black/30" />
 
       {/* 渐变叠加层 - 中速滚动，鼠标跟随线性渐变，距离控制透明度 */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0 z-10 transition-all duration-300 ease-out"
         style={{ y: gradientY }}
       >
@@ -94,9 +94,9 @@ export default function Hero() {
           style={{
             background: isMobile || !isMounted
               ? // 移动端或 SSR：简化的静态渐变
-                'linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(236, 72, 153, 0.4) 50%, rgba(245, 158, 11, 0.4) 100%)'
+              'linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(236, 72, 153, 0.4) 50%, rgba(245, 158, 11, 0.4) 100%)'
               : // 桌面端：从中心指向鼠标的线性渐变
-                `linear-gradient(${gradientAngle}deg, 
+              `linear-gradient(${gradientAngle}deg, 
                   rgba(139, 92, 246, 0.5) 0%, 
                   rgba(236, 72, 153, 0.4) 40%, 
                   rgba(245, 158, 11, 0.3) 70%, 
@@ -107,7 +107,7 @@ export default function Hero() {
       </motion.div>
 
       {/* 内容层 - 正常速度滚动 */}
-      <motion.div 
+      <motion.div
         className="relative z-20 container mx-auto px-4 text-center"
         style={{ y: contentY }}
       >

@@ -174,7 +174,7 @@ export default function Navigation() {
               <div className={`w-[1.5px] h-4 rounded-full ${isScrolled ? "bg-gradient-to-b from-purple-400/60 to-pink-400/60" : "bg-gradient-to-b from-white/50 to-white/20"}`} />
 
               {/* 第二组：计划、活动、云存储 */}
-              {NAV_LINKS.filter(link => ['plan', 'activities', 'cloud'].includes(link.id)).map((link) => (
+              {NAV_LINKS.filter(link => ['plan', 'activities', 'merch', 'products'].includes(link.id)).map((link) => (
                 <div 
                   key={link.id} 
                   className="relative"
@@ -286,11 +286,11 @@ export default function Navigation() {
                               whileHover={{ x: 6 }}
                             >
                               {/* 装饰性图标 */}
-                              <span className={`mr-3 text-lg transition-transform group-hover:scale-110 ${
-                                isScrolled ? "text-purple-500" : "text-purple-400"
-                              }`}>
-                                {subLink.icon || "📌"}
-                              </span>
+                              {subLink.icon && (
+                                <subLink.icon className={`mr-3 w-5 h-5 transition-transform group-hover:scale-110 ${
+                                  isScrolled ? "text-purple-500" : "text-purple-400"
+                                }`} />
+                              )}
                               
                               <span className="flex-1">{subLink.label}</span>
                               
@@ -409,7 +409,7 @@ export default function Navigation() {
                   </li>
 
                   {/* 第二组：计划、活动、云存储 */}
-                  {NAV_LINKS.filter(link => ['plan', 'activities', 'cloud'].includes(link.id)).map((link, index) => (
+                  {NAV_LINKS.filter(link => ['plan', 'activities', 'merch', 'products'].includes(link.id)).map((link, index) => (
                     <motion.li
                       key={link.id}
                       initial={{ opacity: 0, x: 20 }}
@@ -452,10 +452,11 @@ export default function Navigation() {
                                       href={subLink.url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="block px-4 py-2 text-base text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                                      className="flex items-center gap-3 px-4 py-2 text-base text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                                       whileHover={{ x: 4 }}
                                       style={{ minHeight: "44px" }}
                                     >
+                                      {subLink.icon && <subLink.icon className="w-4 h-4 text-purple-500" />}
                                       {subLink.label}
                                     </motion.a>
                                   ))}

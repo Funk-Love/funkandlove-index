@@ -229,6 +229,7 @@ const LEADERS: Leader[] = [
     term: "25届",
     image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/25%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E5%9C%9F%E8%B1%86.jpg",
     bio: "lk舞队25届副队长，物理学专业，rapstar",
+    modalY: "30%",
     role: 'vice'
   },
   {
@@ -369,23 +370,32 @@ export default function Leaders() {
   useBodyScrollLock(selectedLeader !== null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [windowWidth, setWindowWidth] = useState(1200);
+  const [windowHeight, setWindowHeight] = useState(800);
   const [translateX, setTranslateX] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const rafRef = useRef<number>(0);
   
+  // navbar 高度
+  const NAVBAR_HEIGHT = 80;
+  
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   
-  const CARD_WIDTH = 320;
-  const CARD_GAP = 28;
+  // 响应式卡片宽度
+  const CARD_WIDTH = windowWidth < 640 ? 260 : windowWidth < 1024 ? 280 : 320;
+  const CARD_GAP = windowWidth < 640 ? 16 : 28;
   const TOTAL_WIDTH = LEADERS.length * (CARD_WIDTH + CARD_GAP);
-  const SCROLL_DISTANCE = TOTAL_WIDTH - windowWidth + 64;
-  const containerHeight = windowWidth + SCROLL_DISTANCE;
+  const SCROLL_DISTANCE = Math.max(0, TOTAL_WIDTH - windowWidth + 64);
+  // 确保容器高度足够滚动完整个内容，最小为 1.5 倍视口高度
+  const containerHeight = Math.max(windowHeight * 1.5, windowHeight + SCROLL_DISTANCE);
   
   // 使用 RAF 节流的滚动处理
   const handleScroll = useCallback(() => {
@@ -398,7 +408,8 @@ export default function Leaders() {
       }
       
       const rect = containerRef.current.getBoundingClientRect();
-      const scrollStart = -rect.top;
+      // 考虑 navbar 高度，从 navbar 下方开始计算
+      const scrollStart = -rect.top + NAVBAR_HEIGHT;
       const scrollEnd = containerHeight - window.innerHeight;
       const scrollProgress = Math.max(0, Math.min(1, scrollStart / scrollEnd));
       
@@ -406,7 +417,7 @@ export default function Leaders() {
       setProgress(scrollProgress * 100);
       rafRef.current = 0;
     });
-  }, [containerHeight, SCROLL_DISTANCE]);
+  }, [containerHeight, SCROLL_DISTANCE, NAVBAR_HEIGHT]);
   
   // IntersectionObserver 检测可见性
   useEffect(() => {
@@ -446,6 +457,7 @@ export default function Leaders() {
         className="relative bg-neutral-900"
         style={{ height: `${containerHeight}px` }}
       >
+        {/* sticky 容器，top 设为 0 让 navbar 覆盖在上面，内容区域通过 padding 避开 */}
         <div className="sticky top-0 h-screen overflow-hidden">
           {/* 背景装饰 - 减小尺寸和模糊程度 */}
           <div className="absolute inset-0 pointer-events-none">
@@ -453,17 +465,18 @@ export default function Leaders() {
             <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-2xl" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col justify-center px-8 lg:px-16">
+          {/* 内容区域，添加顶部 padding 避开 navbar (使用视口单位) */}
+          <div className="relative z-10 h-full flex flex-col justify-start px-[2vw] sm:px-[4vw] lg:px-[6vw] pt-[12vh] md:pt-[10vh]">
             {/* 标题 - 使用 CSS 动画 */}
             <div
-              className={`mb-8 transition-all duration-700 ${
+              className={`mb-6 sm:mb-8 transition-all duration-700 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
             >
-              <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">
+              <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-4">
                 历年队长
               </h2>
-              <p className="text-xl text-gray-400">
+              <p className="text-base sm:text-xl text-gray-400">
                 从17届至今，一代代队长带领我们走过每一个精彩瞬间
               </p>
             </div>
@@ -471,11 +484,18 @@ export default function Leaders() {
             {/* 卡片容器 - 使用 CSS transform + will-change */}
             <div 
               ref={scrollContainerRef}
-              className="flex gap-7 will-change-transform"
-              style={{ transform: `translateX(${translateX}px)` }}
+              className="flex will-change-transform"
+              style={{ 
+                transform: `translateX(${translateX}px)`,
+                gap: `${CARD_GAP}px`
+              }}
             >
               {LEADERS.map((leader, index) => {
                 const isFounder = leader.role === 'founder';
+                // 响应式卡片高度 - 基于视口高度计算，确保在小视口下也能正常显示
+                // 卡片最大占视口高度的 55%，最小 300px
+                const baseHeight = Math.max(300, Math.min(windowHeight * 0.55, isFounder ? 500 : 460));
+                const cardHeight = isFounder ? baseHeight * 1.08 : baseHeight;
                 
                 return (
                   <div
@@ -490,7 +510,7 @@ export default function Leaders() {
                     
                     <div 
                       className={`relative overflow-hidden rounded-2xl bg-neutral-800 border transition-all duration-300 group-hover:shadow-2xl ${getCardBorderStyle(leader.role)} ${isFounder ? 'border-2' : ''}`}
-                      style={{ height: isFounder ? '500px' : '460px' }}
+                      style={{ height: `${cardHeight}px` }}
                     >
                       <div className="absolute inset-0">
                         <img
@@ -529,10 +549,10 @@ export default function Leaders() {
             </div>
 
             {/* 进度条 - 使用 CSS 宽度 */}
-            <div className="mt-8 max-w-md">
+            <div className="mt-6 sm:mt-8 max-w-md">
               <div className="flex items-center gap-4 mb-2">
-                <span className="text-sm text-gray-500">滚动浏览</span>
-                <span className="text-sm text-gray-500">→</span>
+                <span className="text-xs sm:text-sm text-gray-500">滚动浏览</span>
+                <span className="text-xs sm:text-sm text-gray-500">→</span>
               </div>
               <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                 <div

@@ -69,10 +69,11 @@ export function useSnapScroll({
   const getCurrentSectionIndex = useCallback(() => {
     const scrollY = window.scrollY;
     const viewportHeight = window.innerHeight;
+    const navbarHeight = 80;
     
     for (let i = sectionIds.length - 1; i >= 0; i--) {
       const element = document.getElementById(sectionIds[i]);
-      if (element && scrollY >= element.offsetTop - viewportHeight / 3) {
+      if (element && scrollY >= element.offsetTop - viewportHeight / 3 - navbarHeight) {
         return i;
       }
     }
@@ -84,6 +85,7 @@ export function useSnapScroll({
     const scrollY = window.scrollY;
     const viewportHeight = window.innerHeight;
     const viewportBottom = scrollY + viewportHeight;
+    const navbarHeight = 80;
     
     for (let i = 0; i < sectionIds.length; i++) {
       const element = document.getElementById(sectionIds[i]);
@@ -92,8 +94,8 @@ export function useSnapScroll({
       const sectionTop = element.offsetTop;
       const sectionBottom = sectionTop + element.scrollHeight;
       
-      // 视口大部分在这个 section 内
-      if (scrollY >= sectionTop - 100 && viewportBottom <= sectionBottom + 100) {
+      // 视口大部分在这个 section 内，考虑 navbar 高度
+      if (scrollY >= sectionTop - navbarHeight - 100 && viewportBottom <= sectionBottom + 100) {
         return i;
       }
     }
@@ -107,6 +109,8 @@ export function useSnapScroll({
   const isInScrollableSectionMiddle = useCallback((delta: number): boolean => {
     const scrollY = window.scrollY;
     const viewportHeight = window.innerHeight;
+    // 使用视口高度的百分比作为 navbar 高度，更适应不同缩放
+    const navbarHeight = viewportHeight * 0.08; // 约 8vh
     
     for (const sectionId of scrollableSections) {
       const element = document.getElementById(sectionId);
@@ -116,15 +120,24 @@ export function useSnapScroll({
       const sectionHeight = element.scrollHeight;
       const sectionBottom = sectionTop + sectionHeight;
       
-      const isInSection = scrollY >= sectionTop && scrollY <= sectionBottom - viewportHeight;
+      // 判断是否在 section 范围内（考虑 navbar）
+      const effectiveTop = sectionTop - navbarHeight;
+      const effectiveBottom = sectionBottom - viewportHeight;
+      
+      // 只要滚动位置在 section 的有效范围内就算在里面
+      const isInSection = scrollY >= effectiveTop && scrollY <= effectiveBottom;
       if (!isInSection) continue;
       
-      const nearTop = scrollY < sectionTop + 50;
-      const nearBottom = scrollY > sectionBottom - viewportHeight - 50;
+      // 边界容差使用视口高度的百分比
+      const tolerance = viewportHeight * 0.1; // 10vh
+      const nearTop = scrollY < sectionTop + tolerance;
+      const nearBottom = scrollY > effectiveBottom - tolerance;
       
+      // 在顶部边界向上滚动，或在底部边界向下滚动时，允许 snap 到其他 section
       if (nearTop && delta < 0) return false;
       if (nearBottom && delta > 0) return false;
       
+      // 在中间区域，允许自由滚动
       return true;
     }
     return false;
