@@ -1,4 +1,11 @@
 import { LucideIcon, Video, MessageCircle, Tv, Instagram, Ghost, Target, Zap, Cloud, Bot, Shirt } from "lucide-react";
+import { TEAM_DESCRIPTION, TEAM_PHILOSOPHY, FEATURES } from "./data/team";
+
+/**
+ * 全站统一的 navbar 高度（px）
+ * 滚动锚点偏移、sticky 计算等均基于此值
+ */
+export const NAV_HEIGHT = 80;
 
 /**
  * 社交媒体链接配置
@@ -52,35 +59,14 @@ export const SITE_CONFIG = {
   danceStyle: "Locking（锁舞）",
   memberCount: "40+",
   
-  // 团队描述
-  teamDescription: `Funk & Love是浙江大学DFM街舞社的Locking团队，我们用充满律动的锁舞诠释放克精神。Locking是一种充满欢乐和表现力的街舞风格，以突然的"锁定"动作、指向性手势Point和夸张的表情为特征。`,
-  
-  // 团队理念
-  philosophy: "用舞蹈传递快乐",
-  
-  // 团队特色 - 4个核心特色点
-  features: [
-    {
-      icon: "Scale",
-      title: "平等的",
-      description: "我们尊重每个队员的声音"
-    },
-    {
-      icon: "Heart",
-      title: "包容的",
-      description: "接纳不同背景和水平的舞者，共同成长进步"
-    },
-    {
-      icon: "Users",
-      title: "真诚的",
-      description: "用真心对待每一位成员，建立信任与友谊"
-    },
-    {
-      icon: "Sparkles",
-      title: "热烈的",
-      description: "充满激情与活力，用舞蹈点燃生活的热情"
-    }
-  ] as Feature[],
+  // 团队描述（数据源于 lib/data/team.ts）
+  teamDescription: TEAM_DESCRIPTION,
+
+  // 团队理念（数据源于 lib/data/team.ts）
+  philosophy: TEAM_PHILOSOPHY,
+
+  // 团队特色（数据源于 lib/data/team.ts）
+  features: FEATURES,
   
   // 社交媒体链接
   socialLinks: [

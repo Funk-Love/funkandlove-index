@@ -51,9 +51,21 @@ export default function TeamFeatures() {
     // 初始计算
     updatePositions();
 
-    // 窗口大小改变时重新计算
-    window.addEventListener('resize', updatePositions);
-    return () => window.removeEventListener('resize', updatePositions);
+    // resize 用 rAF 节流，避免拖拽窗口时高频触发布局计算 + setState
+    let rafId: number | null = null;
+    const onResize = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        updatePositions();
+      });
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // 计算每个卡片的动态样式

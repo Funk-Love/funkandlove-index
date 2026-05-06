@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /**
  * RGB 颜色接口
@@ -94,25 +94,33 @@ export function getDistanceFromMouse(
  */
 export function useMousePosition() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  
+  const rafRef = useRef<number | null>(null);
+  const latestRef = useRef({ x: 0, y: 0 });
+
   useEffect(() => {
-    // 鼠标移动事件处理函数
+    // 用 rAF 节流：mousemove 浏览器以 100+Hz 触发，但渲染最多 60Hz，
+    // 同步 setState 会造成不必要的 React 重渲染，影响低端机性能。
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({ 
-        x: e.clientX, 
-        y: e.clientY 
+      latestRef.current.x = e.clientX;
+      latestRef.current.y = e.clientY;
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        setPosition({ x: latestRef.current.x, y: latestRef.current.y });
       });
     };
-    
-    // 添加事件监听器
-    window.addEventListener("mousemove", handleMouseMove);
-    
-    // 清理函数：移除事件监听器
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
   }, []);
-  
+
   return position;
 }
 
