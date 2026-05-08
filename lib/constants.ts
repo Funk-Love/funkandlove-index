@@ -103,28 +103,28 @@ export const SITE_CONFIG = {
      * 建议尺寸: 6000x4000px
      * 用途: 主页顶部全屏背景，与Team section共用同一张图
      */
-    hero: "https://funkandlove-main.s3.bitiful.net/index/team-bg.jpg",
+    hero: "/images/team-bg.jpg",
     
     /**
      * 团队合照
      * 建议尺寸: 800x600px (4:3) 或 1200x800px
      * 用途: 团队介绍区域展示
      */
-    teamPhoto: "https://funkandlove-main.s3.bitiful.net/index/team-photo.jpg",
+    teamPhoto: "/images/team-photo.jpg",
     
     /**
      * 团队特色背景图片
      * 建议尺寸: 1920x1080px (16:9)
      * 用途: 团队特色区域右侧背景
      */
-    featuresBackground: "https://funkandlove-main.s3.bitiful.net/index/features-bg.png",
+    featuresBackground: "/images/features-bg.png",
     
     /**
      * Favicon 图标
      * 尺寸: 32x32px 或 64x64px
      * 格式: .ico
      */
-    favicon: "https://funkandlove-main.s3.bitiful.net/public/favicon.ico",
+    favicon: "/favicon.ico",
     
     /**
      * Logo 图标
@@ -132,7 +132,7 @@ export const SITE_CONFIG = {
      * 格式: .png (透明背景)
      * 用途: OpenGraph、PWA图标等
      */
-    logo: "https://funkandlove-main.s3.bitiful.net/public/icon.png"
+    logo: "/icon.png"
   }
 };
 

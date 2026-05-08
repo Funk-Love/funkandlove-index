@@ -6,14 +6,13 @@ import MobileHero from "./MobileHero";
 import MobileTeamInfo from "./MobileTeamInfo";
 import MobileTeamPhoto from "./MobileTeamPhoto";
 import MobileFeatures from "./MobileFeatures";
-import MobileTeamSpirit from "./MobileTeamSpirit";
 import MobileLeaders from "./MobileLeaders";
 import MobileMembers from "./MobileMembers";
 import MobileSocial from "./MobileSocial";
 import RecruitDialog from "../shared/RecruitDialog";
 
 /**
- * 移动端总装：9 段顺序按 §3.1 IA。
+ * 移动端总装：8 段顺序按 §3.1 IA。
  * - 浮动汉堡导航（MobileNav）
  * - 招新弹窗在最外层挂载，Hero / Nav 共用同一 open state
  */
@@ -29,7 +28,6 @@ export default function MobileView() {
       <MobileTeamInfo />
       <MobileTeamPhoto />
       <MobileFeatures />
-      <MobileTeamSpirit />
       <MobileLeaders />
       <MobileMembers />
       <MobileSocial />

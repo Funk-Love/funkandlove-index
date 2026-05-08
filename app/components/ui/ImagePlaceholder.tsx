@@ -13,6 +13,7 @@ interface ImagePlaceholderProps {
   placeholderText?: string;
   suggestedSize?: string;
   fill?: boolean;
+  sizes?: string;
   priority?: boolean;
   rounded?: boolean;
 }
@@ -27,6 +28,7 @@ export default function ImagePlaceholder({
   placeholderText = '404 - 图片待补充',
   suggestedSize,
   fill = false,
+  sizes,
   priority = false,
   rounded = true,
 }: ImagePlaceholderProps) {
@@ -72,6 +74,7 @@ export default function ImagePlaceholder({
         width={!fill ? width : undefined}
         height={!fill ? height : undefined}
         fill={fill}
+        sizes={sizes}
         priority={priority}
         className={`${rounded ? 'rounded-lg' : ''} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ${imageClassName}`}
         onError={() => {

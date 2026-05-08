@@ -42,7 +42,7 @@ export default function MobileHero() {
           variants={fadeInUp}
           initial="initial"
           animate="animate"
-          src="https://funkandlove-main.s3.bitiful.net/public/icon.png"
+          src="/icon.png"
           alt="Funk & Love Logo"
           className="w-28 h-28 object-contain mb-6"
           style={{

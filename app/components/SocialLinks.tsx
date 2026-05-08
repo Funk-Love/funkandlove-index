@@ -46,10 +46,10 @@ export default function SocialLinks() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-bold text-white mb-4 text-[clamp(1.875rem,5.5vh,3rem)]">
             关注我们
           </h2>
-          <p className="text-neutral-400 text-lg">
+          <p className="text-neutral-400 text-[clamp(0.95rem,2vh,1.125rem)]">
             在社交媒体上了解更多精彩内容
           </p>
         </motion.div>

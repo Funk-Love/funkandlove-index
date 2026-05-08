@@ -21,7 +21,7 @@ export const FEATURES: Feature[] = [
     description: "用真心对待每一位成员，建立信任与友谊"
   },
   {
-    icon: "Sparkles",
+    icon: "Flame",
     title: "热烈的",
     description: "充满激情与活力，用舞蹈点燃生活的热情"
   }

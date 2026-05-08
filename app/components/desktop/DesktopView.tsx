@@ -5,7 +5,6 @@ import Hero from "../Hero";
 import TeamInfo from "../TeamInfo";
 import Team from "../Team";
 import TeamFeatures from "../TeamFeatures";
-import TeamSpirit from "../TeamSpirit";
 import Leaders from "../Leaders";
 import Members from "../Members";
 import SocialLinks from "../SocialLinks";
@@ -18,14 +17,13 @@ const SECTION_IDS = [
   "team-info",
   "team",
   "features",
-  "team-spirit",
   "leaders",
   "members",
   "social",
 ];
 
 /**
- * 桌面端总装：8 段 scrolljacking 单页 + 共享背景层 + section 指示器。
+ * 桌面端总装：7 段 scrolljacking 单页 + 共享背景层 + section 指示器。
  * 由 page.tsx 在非移动端断点下渲染。
  */
 export default function DesktopView() {
@@ -34,6 +32,8 @@ export default function DesktopView() {
     duration: 800,
     threshold: 30,
     enabled: true,
+    // hero / team-info / team / features 四段做 snap，features 之后（leaders 起）完全自由滚动
+    snapEndIndex: SECTION_IDS.indexOf("features"),
   });
 
   return (
@@ -67,10 +67,6 @@ export default function DesktopView() {
 
         <section id="features" className="snap-section bg-neutral-900">
           <TeamFeatures />
-        </section>
-
-        <section id="team-spirit" className="snap-section">
-          <TeamSpirit />
         </section>
 
         <div id="leaders">

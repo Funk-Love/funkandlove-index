@@ -1,36 +1,46 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function CursorGlow() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const isVisibleRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const latestPositionRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    setIsMounted(true);
-    
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      if (!isVisible) setIsVisible(true);
+      latestPositionRef.current = { x: e.clientX, y: e.clientY };
+      if (rafRef.current !== null) return;
+
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        setMousePosition(latestPositionRef.current);
+        if (!isVisibleRef.current) {
+          isVisibleRef.current = true;
+          setIsVisible(true);
+        }
+      });
     };
 
     const handleMouseLeave = () => {
+      isVisibleRef.current = false;
       setIsVisible(false);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, [isVisible]);
+  }, []);
 
-  // 在 SSR 和客户端挂载前不渲染
-  if (!isMounted || !isVisible) return null;
+  if (!isVisible) return null;
 
   return (
     <motion.div

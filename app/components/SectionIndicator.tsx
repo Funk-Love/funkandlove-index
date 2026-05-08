@@ -3,9 +3,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, 
-  Camera, 
-  Sparkles, 
-  Heart, 
+  Camera,
+  Flame,
+  Heart,
   Crown, 
   UserCircle, 
   Share2,
@@ -21,8 +21,7 @@ interface SectionConfig {
 const SECTION_CONFIG: SectionConfig[] = [
   { id: 'team-info', label: '关于我们', icon: Users },
   { id: 'team', label: '团队合照', icon: Camera },
-  { id: 'features', label: '团队特色', icon: Sparkles },
-  { id: 'team-spirit', label: '团队精神', icon: Heart },
+  { id: 'features', label: '团队特色', icon: Flame },
   { id: 'leaders', label: '历年队长', icon: Crown },
   { id: 'members', label: '历年成员', icon: UserCircle },
   { id: 'social', label: '关注我们', icon: Share2 },

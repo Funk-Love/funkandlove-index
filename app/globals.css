@@ -61,6 +61,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* framer-motion useScroll 默认以 documentElement 为 scroll 容器，要求非 static 定位 */
+  position: relative;
 }
 
 body {

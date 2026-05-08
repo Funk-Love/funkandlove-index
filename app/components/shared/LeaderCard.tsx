@@ -89,13 +89,21 @@ export default function LeaderCard({
 
         <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
           <h3
-            className={`font-bold text-white mb-1 ${
-              isFounder ? "text-3xl" : "text-2xl"
-            }`}
+            className="font-bold text-white mb-1"
+            style={{
+              fontSize: isFounder
+                ? "clamp(1.5rem, 3.4vh, 2rem)"
+                : "clamp(1.25rem, 2.8vh, 1.6rem)",
+            }}
           >
             {leader.name}
           </h3>
-          <p className={getTitleColor(leader.role)}>{leader.title}</p>
+          <p
+            className={getTitleColor(leader.role)}
+            style={{ fontSize: "clamp(0.875rem, 1.7vh, 1.05rem)" }}
+          >
+            {leader.title}
+          </p>
         </div>
       </div>
     </div>

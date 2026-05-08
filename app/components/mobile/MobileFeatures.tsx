@@ -5,7 +5,7 @@ import {
   Music,
   Heart,
   Users,
-  Sparkles,
+  Flame,
   Scale,
   type LucideIcon,
 } from "lucide-react";
@@ -15,7 +15,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Music,
   Heart,
   Users,
-  Sparkles,
+  Flame,
   Scale,
 };
 

@@ -33,9 +33,15 @@ export default function Leaders() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 响应式卡片宽度
-  const CARD_WIDTH = windowWidth < 640 ? 260 : windowWidth < 1024 ? 280 : 320;
-  const CARD_GAP = windowWidth < 640 ? 16 : 28;
+  // 响应式卡片宽度（viewport-relative，保证浏览器缩放下物理像素恒定）
+  // 基准：1920px 视口下 320px 卡片 ≈ 16.7% 视口宽度
+  const CARD_WIDTH =
+    windowWidth < 640
+      ? Math.round(Math.max(220, Math.min(280, windowWidth * 0.42)))
+      : windowWidth < 1024
+      ? Math.round(Math.max(240, Math.min(310, windowWidth * 0.22)))
+      : Math.round(Math.max(280, Math.min(360, windowWidth * 0.167)));
+  const CARD_GAP = Math.max(12, Math.round(windowWidth * 0.015));
   const TOTAL_WIDTH = LEADERS.length * (CARD_WIDTH + CARD_GAP);
   const SCROLL_DISTANCE = Math.max(0, TOTAL_WIDTH - windowWidth + 64);
   // 确保容器高度足够滚动完整个内容，最小为 1.5 倍视口高度
@@ -117,10 +123,16 @@ export default function Leaders() {
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-4">
+              <h2
+                className="font-bold text-white mb-2 sm:mb-4"
+                style={{ fontSize: "clamp(1.875rem, 5.5vh, 3.75rem)" }}
+              >
                 历年队长
               </h2>
-              <p className="text-base sm:text-xl text-gray-400">
+              <p
+                className="text-gray-400"
+                style={{ fontSize: "clamp(0.95rem, 2vh, 1.25rem)" }}
+              >
                 从17届至今，一代代队长带领我们走过每一个精彩瞬间
               </p>
             </div>

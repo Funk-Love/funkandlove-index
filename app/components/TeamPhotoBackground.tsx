@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-const IMAGE_URL = "https://funkandlove-main.s3.bitiful.net/index/team-bg.jpg";
+const IMAGE_URL = "/images/team-bg.jpg";
 
 /**
  * 固定的团队照片背景层

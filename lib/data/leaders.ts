@@ -6,7 +6,7 @@ export const LEADERS: Leader[] = [
     name: "方翔",
     title: "建队",
     term: "17届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/17%E5%B1%8A-%E9%98%9F%E9%95%BF-%E6%96%B9%E7%BF%94.jpg",
+    image: "/images/leaders/17届-队长-方翔.jpg",
     bio: "locking舞队17届队长，音乐人Laymen，量子计算科研人",
     modalY: "0%",
     role: 'founder'
@@ -16,7 +16,7 @@ export const LEADERS: Leader[] = [
     name: "小麦",
     title: "队长",
     term: "18-19届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/18-19%E5%B1%8A-%E9%98%9F%E9%95%BF-%E5%B0%8F%E9%BA%A6.jpg",
+    image: "/images/leaders/18-19届-队长-小麦.jpg",
     bio: "2017级入学，2018届副队，2019届队长，跳舞特点是黏糊糊的",
     role: 'captain'
   },
@@ -25,7 +25,7 @@ export const LEADERS: Leader[] = [
     name: "水水",
     title: "副队长",
     term: "18-19届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/18-19%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E6%B0%B4%E6%B0%B4.jpg",
+    image: "/images/leaders/18-19届-副队长-水水.jpg",
     bio: "18届副队长",
     role: 'vice'
   },
@@ -34,7 +34,7 @@ export const LEADERS: Leader[] = [
     name: "蹄蹄",
     title: "副队长",
     term: "19届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/19%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E8%B9%84%E8%B9%84.jpg",
+    image: "/images/leaders/19届-副队长-蹄蹄.jpg",
     bio: "19级locking副队长，临床医学",
     role: 'vice'
   },
@@ -43,7 +43,7 @@ export const LEADERS: Leader[] = [
     name: "格格",
     title: "队长",
     term: "20届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/20%E5%B1%8A-%E9%98%9F%E9%95%BF-%E6%A0%BC%E6%A0%BC.jpg",
+    image: "/images/leaders/20届-队长-格格.jpg",
     bio: "19级法学+01年天秤，LK队长，身份法师，技能端水。ENFP快乐小狗，遵循LK的核心宗旨，律动是up，心情是快乐！",
     role: 'captain'
   },
@@ -52,7 +52,7 @@ export const LEADERS: Leader[] = [
     name: "小柿",
     title: "队长",
     term: "20届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/20%E5%B1%8A-%E9%98%9F%E9%95%BF-%E5%B0%8F%E6%9F%BF.jpg",
+    image: "/images/leaders/20届-队长-小柿.jpg",
     bio: "20届队长，电子科学与技术",
     role: 'captain'
   },
@@ -61,7 +61,7 @@ export const LEADERS: Leader[] = [
     name: "小雪",
     title: "队长",
     term: "21届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/21%E5%B1%8A-%E9%98%9F%E9%95%BF-%E5%B0%8F%E9%9B%AA.jpg",
+    image: "/images/leaders/21届-队长-小雪.jpg",
     bio: "lk舞队21届队长，物理学专业",
     modalY: "30%",
     role: 'captain'
@@ -71,7 +71,7 @@ export const LEADERS: Leader[] = [
     name: "库库",
     title: "队长",
     term: "21届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/21%E5%B1%8A-%E9%98%9F%E9%95%BF-%E5%BA%93%E5%BA%93.jpg",
+    image: "/images/leaders/21届-队长-库库.jpg",
     bio: "主张快乐跳舞，有时间就去跳舞",
     role: 'captain'
   },
@@ -80,7 +80,7 @@ export const LEADERS: Leader[] = [
     name: "贝贝",
     title: "队长",
     term: "21届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/21%E5%B1%8A-%E9%98%9F%E9%95%BF-%E8%B4%9D%E8%B4%9D.jpg",
+    image: "/images/leaders/21届-队长-贝贝.jpg",
     bio: "lk舞队21届队长，法学专业。lk队于我而言承载了许多值得纪念的瞬间，我爱这个队也爱这个队里的人。",
     role: 'captain'
   },
@@ -89,7 +89,7 @@ export const LEADERS: Leader[] = [
     name: "裤子",
     title: "音乐总监",
     term: "21届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/21%E5%B1%8A-%E9%9F%B3%E4%B9%90%E6%80%BB%E7%9B%91-%E8%A3%A4%E5%AD%90.jpg",
+    image: "/images/leaders/21届-音乐总监-裤子.jpg",
     bio: "locking舞队21届音乐总监，建筑学专业",
     cardX: "100%",
     modalY: "0%",
@@ -100,7 +100,7 @@ export const LEADERS: Leader[] = [
     name: "皮蛋",
     title: "队长",
     term: "22届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/22%E5%B1%8A-%E9%98%9F%E9%95%BF-%E7%9A%AE%E8%9B%8B.jpg",
+    image: "/images/leaders/22届-队长-皮蛋.jpg",
     bio: "22-23年队长。现在是天选打工人，设计院画图狗。无比怀念和大家一起跳舞、旅游、团建、吃饭、通宵……的日子。Funk&love forever!!!",
     role: 'captain'
   },
@@ -109,7 +109,7 @@ export const LEADERS: Leader[] = [
     name: "小明",
     title: "副队长",
     term: "22届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/22%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E5%B0%8F%E6%98%8E.jpg",
+    image: "/images/leaders/22届-副队长-小明.jpg",
     bio: "大暗爹，21年入队，22届locking副队长，热爱locking",
     role: 'vice'
   },
@@ -118,7 +118,7 @@ export const LEADERS: Leader[] = [
     name: "觥筹",
     title: "队长",
     term: "23届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/23%E5%B1%8A-%E9%98%9F%E9%95%BF-%E8%A7%A5%E7%AD%B9.jpg",
+    image: "/images/leaders/23届-队长-觥筹.jpg",
     bio: "23届lk舞队队长",
     role: 'captain'
   },
@@ -127,7 +127,7 @@ export const LEADERS: Leader[] = [
     name: "阿珂",
     title: "副队长",
     term: "23届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/23%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E9%98%BF%E7%8F%82.jpg",
+    image: "/images/leaders/23届-副队长-阿珂.jpg",
     bio: "23届lk舞队副队长，本科22级机械工程，isfj",
     role: 'vice'
   },
@@ -136,7 +136,7 @@ export const LEADERS: Leader[] = [
     name: "橡皮",
     title: "副队长",
     term: "23届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/23%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E6%A9%A1%E7%9A%AE.jpg",
+    image: "/images/leaders/23届-副队长-橡皮.jpg",
     bio: "23届lk副队长，单身可撩",
     role: 'vice'
   },
@@ -145,7 +145,7 @@ export const LEADERS: Leader[] = [
     name: "小查",
     title: "队长",
     term: "24届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/24%E5%B1%8A-%E9%98%9F%E9%95%BF-%E5%B0%8F%E6%9F%A5.jpg",
+    image: "/images/leaders/24届-队长-小查.jpg",
     bio: "24～25年locking队长，🐸门徒（自封版），小孩哥（自封版），hiphop locking双修（自封版）",
     modalY: "30%",
     role: 'captain'
@@ -155,7 +155,7 @@ export const LEADERS: Leader[] = [
     name: "JOJO",
     title: "副队长",
     term: "24届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/24%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-JOJO.jpg",
+    image: "/images/leaders/24届-副队长-JOJO.jpg",
     bio: "24届locking舞队副队长，男，未婚",
     modalY: "20%",
     role: 'vice'
@@ -165,7 +165,7 @@ export const LEADERS: Leader[] = [
     name: "阿威",
     title: "副队长",
     term: "24届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/24%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E9%98%BF%E5%A8%81.jpg",
+    image: "/images/leaders/24届-副队长-阿威.jpg",
     bio: "24届locking舞队副队长，目前是信电老博，肥宅desu，欢迎约舞，一起索，锁出青春",
     modalY: "10%",
     role: 'vice'
@@ -175,7 +175,7 @@ export const LEADERS: Leader[] = [
     name: "dragon",
     title: "队长",
     term: "25届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/25%E5%B1%8A-%E9%98%9F%E9%95%BF-dragon.jpg",
+    image: "/images/leaders/25届-队长-dragon.jpg",
     bio: "locking舞队25届队长，westside汉语言，其他人都比我强，和大家一起感受locking最本真的快乐。永远的放克·赫艾！",
     modalY: "30%",
     role: 'captain'
@@ -185,7 +185,7 @@ export const LEADERS: Leader[] = [
     name: "土豆",
     title: "副队长",
     term: "25届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/25%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E5%9C%9F%E8%B1%86.jpg",
+    image: "/images/leaders/25届-副队长-土豆.jpg",
     bio: "lk舞队25届副队长，物理学专业，rapstar",
     modalY: "30%",
     role: 'vice'
@@ -195,7 +195,7 @@ export const LEADERS: Leader[] = [
     name: "阿fai",
     title: "副队长",
     term: "25届",
-    image: "https://funkandlove-main.s3.bitiful.net/index/history/leaders/25%E5%B1%8A-%E5%89%AF%E9%98%9F%E9%95%BF-%E9%98%BFfai.jpg",
+    image: "/images/leaders/25届-副队长-阿fai.jpg",
     bio: "25届lk副队长，电气工程专业，喜欢唱歌，偶尔追星，练习时长一年半。在舞队的时光会成为我大学生活最重要的记忆之一🥰",
     modalY: "30%",
     role: 'vice'

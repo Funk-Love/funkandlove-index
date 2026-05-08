@@ -2,7 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { Music, Heart, Users, Sparkles, Scale, LucideIcon } from 'lucide-react';
+import { Music, Heart, Users, Flame, Scale, LucideIcon } from 'lucide-react';
 import Card from './ui/Card';
 import ImagePlaceholder from './ui/ImagePlaceholder';
 import { SITE_CONFIG } from '@/lib/constants';
@@ -14,7 +14,7 @@ const iconMap: Record<string, LucideIcon> = {
   Music,
   Heart,
   Users,
-  Sparkles,
+  Flame,
   Scale,
 };
 
@@ -144,12 +144,12 @@ export default function TeamFeatures() {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.6 }}
-            className="mb-12"
+            className="mb-[clamp(1.5rem,5vh,3rem)]"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="font-bold text-white mb-4 text-[clamp(1.75rem,5.5vh,3rem)]">
               团队特色
             </h2>
-            <p className="text-lg text-neutral-300">
+            <p className="text-neutral-300 text-[clamp(0.95rem,2vh,1.125rem)]">
               我们的四大核心优势
             </p>
           </motion.div>
@@ -160,7 +160,7 @@ export default function TeamFeatures() {
             variants={staggerContainer}
             initial="initial"
             animate={isInView ? 'animate' : 'initial'}
-            className="space-y-6"
+            className="space-y-[clamp(0.75rem,2vh,1.5rem)]"
           >
             {SITE_CONFIG.features.map((feature, index) => {
               const IconComponent = iconMap[feature.icon];
@@ -201,12 +201,12 @@ export default function TeamFeatures() {
                       {/* 文字内容 */}
                       <div className="flex-1">
                         {/* 标题 */}
-                        <h3 className="text-lg font-bold text-white mb-2">
+                        <h3 className="font-bold text-white mb-2 text-[clamp(1rem,2.1vh,1.25rem)]">
                           {feature.title}
                         </h3>
 
                         {/* 描述 */}
-                        <p className="text-neutral-200 text-sm leading-relaxed">
+                        <p className="text-neutral-200 leading-relaxed text-[clamp(0.8rem,1.6vh,1rem)]">
                           {feature.description}
                         </p>
                       </div>

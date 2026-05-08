@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
+import RecruitDialog from "./shared/RecruitDialog";
 
 // Toast 组件
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -37,9 +38,11 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
  */
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const isScrolledRef = useRef(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [recruitOpen, setRecruitOpen] = useState(false);
 
   // 显示 toast 提示
   const showToast = (message: string) => {
@@ -48,12 +51,30 @@ export default function Navigation() {
 
   // 监听滚动，添加毛玻璃背景效果
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    let rafId: number | null = null;
+
+    const updateScrolled = () => {
+      const nextIsScrolled = window.scrollY > 20;
+      if (isScrolledRef.current === nextIsScrolled) return;
+
+      isScrolledRef.current = nextIsScrolled;
+      setIsScrolled(nextIsScrolled);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        updateScrolled();
+      });
+    };
+
+    updateScrolled();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // 平滑滚动到指定区域
@@ -105,7 +126,7 @@ export default function Navigation() {
               <div className="relative w-8 h-8 md:w-10 md:h-10">
                 {/* 未滚动 - 默认白色 */}
                 <img
-                  src="https://funkandlove-main.s3.bitiful.net/public/icon.png"
+                  src="/icon.png"
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-0" : "opacity-100 group-hover:opacity-0"
@@ -113,7 +134,7 @@ export default function Navigation() {
                 />
                 {/* 未滚动 - hover 浅紫色 */}
                 <img
-                  src="https://funkandlove-main.s3.bitiful.net/public/icon-lightpurple.png"
+                  src="/icon-lightpurple.png"
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-0" : "opacity-0 group-hover:opacity-100"
@@ -121,7 +142,7 @@ export default function Navigation() {
                 />
                 {/* 滚动后 - 默认黑色 */}
                 <img
-                  src="https://funkandlove-main.s3.bitiful.net/public/icon-black.png"
+                  src="/icon-black.png"
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-100 group-hover:opacity-0" : "opacity-0"
@@ -129,7 +150,7 @@ export default function Navigation() {
                 />
                 {/* 滚动后 - hover 深紫色 */}
                 <img
-                  src="https://funkandlove-main.s3.bitiful.net/public/icon-darkpurple.png"
+                  src="/icon-darkpurple.png"
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-0 group-hover:opacity-100" : "opacity-0"
@@ -313,6 +334,23 @@ export default function Navigation() {
                   </AnimatePresence>
                 </div>
               ))}
+
+              {/* 加入我们 - 与其他 nav 按钮同款样式 */}
+              <motion.button
+                onClick={() => setRecruitOpen(true)}
+                className={`text-base font-medium transition-colors relative group ${
+                  isScrolled
+                    ? "text-gray-700 hover:text-purple-600"
+                    : "text-white/90 hover:text-white"
+                }`}
+                whileHover={{ y: -2 }}
+                whileTap={{ y: 0 }}
+              >
+                加入我们
+                <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                  isScrolled ? "bg-purple-600" : "bg-white"
+                }`} />
+              </motion.button>
             </div>
 
             {/* 移动端汉堡菜单按钮 */}
@@ -505,6 +543,8 @@ export default function Navigation() {
           </>
         )}
       </AnimatePresence>
+
+      <RecruitDialog open={recruitOpen} onClose={() => setRecruitOpen(false)} />
     </>
   );
 }

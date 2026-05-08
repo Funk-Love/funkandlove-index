@@ -1,14 +1,7 @@
 import type { Generation } from "@/lib/types";
 
 export function buildMemberImageUrl(term: string, name: string, ext: string = "jpg"): string {
-  const baseUrl = "https://funkandlove-main.s3.bitiful.net/index/funk%EF%BC%86love%E6%88%90%E5%91%98%E7%85%A7%E7%89%87";
-  const encodedTerm = encodeURIComponent(term);
-  const encodedName = encodeURIComponent(name);
-  return `${baseUrl}/${encodedTerm}/${encodedName}.${ext}`;
-}
-
-export function getThumbnailUrl(imageUrl: string): string {
-  return `${imageUrl}?w=80&q=30`;
+  return `/images/members/${term}/${name}.${ext}`;
 }
 
 export const GENERATIONS: Generation[] = [

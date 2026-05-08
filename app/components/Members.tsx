@@ -140,7 +140,7 @@ function TimelineNode({
         />
         {/* 连接线 */}
         {!isLast && (
-          <div className={`w-0.5 h-32 ${isCollecting ? "bg-gray-700" : "bg-gradient-to-b from-purple-500/50 to-transparent"}`} />
+          <div className={`w-0.5 h-[clamp(5rem,14vh,10rem)] ${isCollecting ? "bg-gray-700" : "bg-gradient-to-b from-purple-500/50 to-transparent"}`} />
         )}
       </div>
 
@@ -154,7 +154,7 @@ function TimelineNode({
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <span className={`text-2xl font-bold ${isCollecting ? "text-gray-500" : "text-white"}`}>
+            <span className={`font-bold text-[clamp(1.25rem,2.8vh,1.75rem)] ${isCollecting ? "text-gray-500" : "text-white"}`}>
               {generation.term}
             </span>
             <span className={`text-sm px-3 py-1 rounded-full ${isCollecting
@@ -252,17 +252,17 @@ export default function Members() {
         <div className={`relative z-10 max-w-4xl mx-auto px-8 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           {/* 标题 - 使用 CSS 动画代替 motion */}
           <div
-            className={`text-center mb-16 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            className={`text-center mb-[clamp(2rem,6vh,4rem)] transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
           >
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-4">
+            <h2 className="font-bold text-white mb-4 text-[clamp(1.875rem,5.5vh,3.75rem)]">
               历年成员
             </h2>
-            <p className="text-xl text-gray-400">
+            <p className="text-gray-400 text-[clamp(0.95rem,2vh,1.25rem)]">
               每一届都是独特的记忆，每一位都是珍贵的伙伴
             </p>
             {/* 移除无限循环动画，改用 CSS animation */}
-            <div className="mt-8 animate-bounce">
+            <div className="mt-[clamp(1rem,3vh,2rem)] animate-bounce">
               <ChevronDown className="w-8 h-8 text-gray-500 mx-auto" />
             </div>
           </div>

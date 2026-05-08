@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Copy, Check } from "lucide-react";
+import { Heart, Copy, Check } from "lucide-react";
 import { RECRUIT_CONTACT } from "@/lib/data/team";
 import DetailSheet from "./DetailSheet";
 
@@ -41,7 +41,7 @@ export default function RecruitDialog({ open, onClose }: Props) {
       <div className="p-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-xl bg-amber-500/15">
-            <Sparkles className="w-5 h-5 text-amber-400" strokeWidth={2} />
+            <Heart className="w-5 h-5 text-amber-400" strokeWidth={2} />
           </div>
           <h3 className="text-2xl font-bold text-white">想加入 Funk &amp; Love？</h3>
         </div>

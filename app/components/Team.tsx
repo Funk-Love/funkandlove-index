@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const CONFIG_URL = "https://funkandlove-main.s3.bitiful.net/index/team-config.json";
+const CONFIG_URL = "/images/team-config.json";
 
 interface TeamMember {
   id: number;
@@ -171,10 +171,10 @@ export default function Team() {
         viewport={{ once: true }}
         className="absolute top-24 left-0 right-0 z-20 text-center pointer-events-none"
       >
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 drop-shadow-lg">
+        <h2 className="font-bold text-white mb-3 drop-shadow-lg text-[clamp(1.75rem,5.5vh,3.75rem)]">
           我们的团队
         </h2>
-        <p className="text-lg text-white/80 drop-shadow-md">
+        <p className="text-white/80 drop-shadow-md text-[clamp(0.95rem,2vh,1.125rem)]">
           将鼠标悬停在成员上查看名字
         </p>
       </motion.div>

@@ -46,7 +46,6 @@ export default function TeamInfo() {
 
   return (
     <section
-      id="team-info"
       ref={ref}
       className="relative min-h-screen flex items-start pt-[12vh] pb-12 md:pt-[10vh] md:pb-16 px-4 overflow-hidden"
     >
@@ -61,7 +60,7 @@ export default function TeamInfo() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 lg:mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 mb-3">
+          <h2 className="font-bold text-neutral-900 mb-3 text-[clamp(1.75rem,5.5vh,3rem)]">
             关于我们
           </h2>
           <div className="w-16 lg:w-20 h-1 bg-linear-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
@@ -81,6 +80,8 @@ export default function TeamInfo() {
                 src={SITE_CONFIG.images.teamPhoto}
                 alt="Funk & Love 团队合照"
                 fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
                 className="w-full h-full"
                 imageClassName="object-cover"
                 suggestedSize="1200x800px"
@@ -102,13 +103,13 @@ export default function TeamInfo() {
           >
             {/* 团队名称和 Slogan */}
             <div>
-              <h3 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-3">
+              <h3 className="font-bold text-neutral-900 mb-3 text-[clamp(1.5rem,4.5vh,2.5rem)]">
                 {SITE_CONFIG.name}
               </h3>
-              <p className="text-xl md:text-2xl font-light italic text-purple-600 mb-6">
+              <p className="font-light italic text-purple-600 mb-6 text-[clamp(1.125rem,2.6vh,1.5rem)]">
                 {SITE_CONFIG.slogan}
               </p>
-              <p className="text-neutral-600 leading-relaxed text-base md:text-lg">
+              <p className="text-neutral-600 leading-relaxed text-[clamp(0.95rem,1.9vh,1.125rem)]">
                 {SITE_CONFIG.teamDescription}
               </p>
             </div>
