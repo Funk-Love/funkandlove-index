@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# 静态资源（图片/图标体积大，本地管理，不入库）
+/public/
+
 # production
 /build
 /dist
