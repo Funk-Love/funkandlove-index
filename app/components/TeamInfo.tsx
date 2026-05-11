@@ -2,148 +2,108 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Building2, Music2, Users2, MapPin } from 'lucide-react';
-import ImagePlaceholder from './ui/ImagePlaceholder';
+import VideoPlayer from './VideoPlayer';
+import SectionHeader from './ui/SectionHeader';
 import { slideInLeft, slideInRight } from '@/lib/animations';
 import { SITE_CONFIG } from '@/lib/constants';
 
 /**
- * 团队信息组件
- * 展示团队基本信息，包含团队照片和详细信息
- * 实现响应式两栏布局（桌面）和单栏布局（移动）
+ * 关于我们:左视频 + 右编辑式数据列(7:5 分栏)。
+ * 去掉了原本的彩色图标卡片,改成 mono eyebrow + 编号数据条,更杂志风。
  */
 export default function TeamInfo() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
 
-  // 团队信息项配置
-  const infoItems = [
-    {
-      icon: Building2,
-      label: '所属组织',
-      value: SITE_CONFIG.organization,
-      color: 'text-purple-500'
-    },
-    {
-      icon: Music2,
-      label: '舞种类型',
-      value: SITE_CONFIG.danceStyle,
-      color: 'text-orange-500'
-    },
-    {
-      icon: Users2,
-      label: '团队规模',
-      value: `${SITE_CONFIG.memberCount} 成员`,
-      color: 'text-blue-500'
-    },
-    {
-      icon: MapPin,
-      label: '团队理念',
-      value: SITE_CONFIG.philosophy,
-      color: 'text-pink-500'
-    }
+  const facts = [
+    { label: '所属组织', value: SITE_CONFIG.organization },
+    { label: '舞种', value: SITE_CONFIG.danceStyle },
+    { label: '规模', value: `${SITE_CONFIG.memberCount} 成员` },
+    { label: '理念', value: SITE_CONFIG.philosophy },
   ];
 
   return (
     <section
       ref={ref}
-      className="relative min-h-screen flex items-start pt-[12vh] pb-12 md:pt-[10vh] md:pb-16 px-4 overflow-hidden"
+      className="relative min-h-screen flex items-center py-16 lg:py-20 px-4 overflow-hidden"
     >
-      {/* 背景装饰 */}
       <div className="absolute inset-0 bg-linear-to-b from-neutral-50 to-white -z-10" />
 
       <div className="max-w-7xl mx-auto w-full">
-        {/* 区域标题 */}
+        {/* 标题:mono eyebrow + 大标题 + 细分隔 */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 lg:mb-12"
+          className="mb-10 lg:mb-14"
         >
-          <h2 className="font-bold text-neutral-900 mb-3 text-[clamp(1.75rem,5.5vh,3rem)]">
-            关于我们
-          </h2>
-          <div className="w-16 lg:w-20 h-1 bg-linear-to-r from-purple-500 to-pink-500 mx-auto rounded-full" />
+          <SectionHeader index={1} eyebrow="about" title="关于我们" theme="light" />
         </motion.div>
 
-        {/* 两栏布局 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* 左侧：团队照片 */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+          {/* 左:视频 7/12 */}
           <motion.div
             initial="initial"
             animate={isInView ? 'animate' : 'initial'}
             variants={slideInLeft}
-            className="relative"
+            className="lg:col-span-7"
           >
-            <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl">
-              <ImagePlaceholder
-                src={SITE_CONFIG.images.teamPhoto}
-                alt="Funk & Love 团队合照"
-                fill
-                priority
-                sizes="(min-width: 1024px) 50vw, 100vw"
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-neutral-200/70 shadow-2xl shadow-purple-500/10">
+              <VideoPlayer
+                src="/video/promo/master.m3u8"
+                poster="/video/promo/poster.webp"
                 className="w-full h-full"
-                imageClassName="object-cover"
-                suggestedSize="1200x800px"
-                placeholderText="团队合照待补充"
               />
-
-              {/* 装饰元素 */}
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-linear-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-2xl -z-10" />
-              <div className="absolute -top-6 -left-6 w-40 h-40 bg-linear-to-br from-orange-500/20 to-blue-500/20 rounded-full blur-2xl -z-10" />
             </div>
           </motion.div>
 
-          {/* 右侧：团队信息 */}
+          {/* 右:slogan + 描述 + 数据列 5/12 */}
           <motion.div
             initial="initial"
             animate={isInView ? 'animate' : 'initial'}
             variants={slideInRight}
-            className="space-y-8"
+            className="lg:col-span-5"
           >
-            {/* 团队名称和 Slogan */}
-            <div>
-              <h3 className="font-bold text-neutral-900 mb-3 text-[clamp(1.5rem,4.5vh,2.5rem)]">
-                {SITE_CONFIG.name}
-              </h3>
-              <p className="font-light italic text-purple-600 mb-6 text-[clamp(1.125rem,2.6vh,1.5rem)]">
-                {SITE_CONFIG.slogan}
-              </p>
-              <p className="text-neutral-600 leading-relaxed text-[clamp(0.95rem,1.9vh,1.125rem)]">
-                {SITE_CONFIG.teamDescription}
-              </p>
-            </div>
+            {/* Slogan,渐变文字,作主视觉 */}
+            <p
+              className="font-light italic leading-[1.15] text-[clamp(1.5rem,3.4vh,2.25rem)] mb-6"
+              style={{
+                backgroundImage:
+                  'linear-gradient(135deg, #8b5cf6 0%, #ec4899 55%, #f59e0b 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                color: 'transparent',
+              }}
+            >
+              {SITE_CONFIG.slogan}
+            </p>
 
-            {/* 信息卡片网格 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {infoItems.map((item, index) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                  transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                  className="group relative bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 border border-neutral-100"
+            <p className="text-neutral-600 leading-relaxed text-[clamp(0.95rem,1.95vh,1.0625rem)] mb-8">
+              {SITE_CONFIG.teamDescription}
+            </p>
+
+            {/* 数据条 — 无卡片,只用上下边线分隔 */}
+            <ul className="border-t border-neutral-300/70">
+              {facts.map((f, i) => (
+                <motion.li
+                  key={f.label}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                  transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
+                  className="flex items-baseline gap-4 py-3.5 border-b border-neutral-200"
                 >
-                  {/* 图标 */}
-                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg bg-linear-to-br ${item.color === 'text-purple-500' ? 'from-purple-100 to-purple-50' :
-                      item.color === 'text-orange-500' ? 'from-orange-100 to-orange-50' :
-                        item.color === 'text-blue-500' ? 'from-blue-100 to-blue-50' :
-                          'from-pink-100 to-pink-50'
-                    } mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon className={`w-6 h-6 ${item.color}`} />
-                  </div>
-
-                  {/* 标签和值 */}
-                  <div>
-                    <p className="text-sm text-neutral-500 mb-1">{item.label}</p>
-                    <p className="text-base font-semibold text-neutral-900">{item.value}</p>
-                  </div>
-
-                  {/* 悬停效果 */}
-                  <div className="absolute inset-0 rounded-xl bg-linear-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
-                </motion.div>
+                  <span className="font-mono text-[11px] text-neutral-400 tabular-nums">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="text-sm text-neutral-500 min-w-14">
+                    {f.label}
+                  </span>
+                  <span className="text-neutral-900 font-medium ml-auto text-right text-[15px]">
+                    {f.value}
+                  </span>
+                </motion.li>
               ))}
-            </div>
+            </ul>
           </motion.div>
         </div>
       </div>

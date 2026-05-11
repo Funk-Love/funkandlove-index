@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { Music, Heart, Users, Flame, Scale, LucideIcon } from 'lucide-react';
 import Card from './ui/Card';
+import SectionHeader from './ui/SectionHeader';
 import ImagePlaceholder from './ui/ImagePlaceholder';
 import { SITE_CONFIG } from '@/lib/constants';
 import { staggerContainer, cardItem } from '@/lib/animations';
@@ -146,12 +147,13 @@ export default function TeamFeatures() {
             transition={{ duration: 0.6 }}
             className="mb-[clamp(1.5rem,5vh,3rem)]"
           >
-            <h2 className="font-bold text-white mb-4 text-[clamp(1.75rem,5.5vh,3rem)]">
-              团队特色
-            </h2>
-            <p className="text-neutral-300 text-[clamp(0.95rem,2vh,1.125rem)]">
-              我们的四大核心优势
-            </p>
+            <SectionHeader
+              index={3}
+              eyebrow="features"
+              title="团队特色"
+              subtitle="我们的四大核心优势"
+              theme="dark"
+            />
           </motion.div>
 
           {/* 特色卡片 - 垂直排列 */}

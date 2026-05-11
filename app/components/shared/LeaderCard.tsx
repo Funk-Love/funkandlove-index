@@ -2,6 +2,7 @@
 
 import { Crown } from "lucide-react";
 import type { Leader } from "@/lib/types";
+import { asset } from "@/lib/cdn";
 import {
   getCardBorderStyle,
   getRoleBadgeStyle,
@@ -32,6 +33,7 @@ export default function LeaderCard({
   onClick,
 }: Props) {
   const isFounder = leader.role === "founder";
+  const imageSrc = asset(leader.image);
 
   return (
     <div
@@ -53,7 +55,7 @@ export default function LeaderCard({
       >
         <div className="absolute inset-0">
           <img
-            src={leader.image}
+            src={imageSrc}
             alt={leader.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             style={{

@@ -1,0 +1,5 @@
+/* Funk & Love Plyr 主题:只换主色,其余保留 Plyr 默认。 */
+
+.plyr-funk {
+  --plyr-color-main: #ec4899;
+}

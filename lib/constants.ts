@@ -57,7 +57,7 @@ export const SITE_CONFIG = {
   description: "浙江大学DFM街舞社Locking团队",
   organization: "浙江大学DFM街舞社",
   danceStyle: "Locking（锁舞）",
-  memberCount: "40+",
+  memberCount: "50+",
   
   // 团队描述（数据源于 lib/data/team.ts）
   teamDescription: TEAM_DESCRIPTION,

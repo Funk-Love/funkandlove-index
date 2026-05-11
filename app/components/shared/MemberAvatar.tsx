@@ -1,6 +1,7 @@
 "use client";
 
 import type { Member } from "@/lib/types";
+import { asset } from "@/lib/cdn";
 
 interface Props {
   member: Member;
@@ -24,10 +25,11 @@ export default function MemberAvatar({
   size,
 }: Props) {
   const sizeCls = size ? SIZE[size] : "";
+  const imageSrc = asset(member.image);
 
   return (
     <img
-      src={member.image}
+      src={imageSrc}
       alt={member.name}
       className={`object-cover ${sizeCls} ${className}`}
       loading={lazy ? "lazy" : "eager"}

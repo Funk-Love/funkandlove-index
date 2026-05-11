@@ -5,6 +5,7 @@ import { NAV_HEIGHT } from "@/lib/constants";
 import { LEADERS } from "@/lib/data/leaders";
 import type { Leader } from "@/lib/types";
 import LeaderCard from "./shared/LeaderCard";
+import SectionHeader from "./ui/SectionHeader";
 import LeaderDetail from "./shared/LeaderDetail";
 import DetailSheet from "./shared/DetailSheet";
 import { getModalBorderStyle } from "./shared/leaderStyles";
@@ -123,18 +124,13 @@ export default function Leaders() {
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              <h2
-                className="font-bold text-white mb-2 sm:mb-4"
-                style={{ fontSize: "clamp(1.875rem, 5.5vh, 3.75rem)" }}
-              >
-                历年队长
-              </h2>
-              <p
-                className="text-gray-400"
-                style={{ fontSize: "clamp(0.95rem, 2vh, 1.25rem)" }}
-              >
-                从17届至今，一代代队长带领我们走过每一个精彩瞬间
-              </p>
+              <SectionHeader
+                index={4}
+                eyebrow="captains"
+                title="历年队长"
+                subtitle="从17届至今,一代代队长带领我们走过每一个精彩瞬间"
+                theme="dark"
+              />
             </div>
 
             <div

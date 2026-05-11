@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from "react";
 import { X, Users, Clock, ChevronDown } from "lucide-react";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import { GENERATIONS } from "@/lib/data/members";
+import { asset } from "@/lib/cdn";
+import SectionHeader from "./ui/SectionHeader";
 import type { Generation as GenerationData } from "@/lib/types";
 import MemberAvatar from "./shared/MemberAvatar";
 
@@ -82,7 +84,7 @@ function MembersModal({
                 >
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-neutral-800 border border-white/5 group-hover:border-purple-500/50 transition-all duration-300">
                     <img
-                      src={member.image}
+                      src={asset(member.image)}
                       alt={member.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -255,12 +257,14 @@ export default function Members() {
             className={`text-center mb-[clamp(2rem,6vh,4rem)] transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
           >
-            <h2 className="font-bold text-white mb-4 text-[clamp(1.875rem,5.5vh,3.75rem)]">
-              历年成员
-            </h2>
-            <p className="text-gray-400 text-[clamp(0.95rem,2vh,1.25rem)]">
-              每一届都是独特的记忆，每一位都是珍贵的伙伴
-            </p>
+            <SectionHeader
+              index={5}
+              eyebrow="members"
+              title="历年成员"
+              subtitle="每一届都是独特的记忆,每一位都是珍贵的伙伴"
+              theme="dark"
+              align="center"
+            />
             {/* 移除无限循环动画，改用 CSS animation */}
             <div className="mt-[clamp(1rem,3vh,2rem)] animate-bounce">
               <ChevronDown className="w-8 h-8 text-gray-500 mx-auto" />

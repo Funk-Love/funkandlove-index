@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ExternalLink, ChevronDown } from "lucide-react";
 import { useBodyScrollLock } from "../../hooks/useBodyScrollLock";
 import { NAV_LINKS } from "@/lib/constants";
+import { oss } from "@/lib/cdn";
 
 interface Props {
   onJoinClick: () => void;
@@ -66,7 +67,7 @@ export default function MobileNav({ onJoinClick }: Props) {
               <div className="flex items-center justify-between p-5 border-b border-white/10">
                 <div className="flex items-center gap-2">
                   <img
-                    src="/icon.png"
+                    src={oss("/icon.png")}
                     alt="Funk & Love"
                     className="w-7 h-7 object-contain"
                   />

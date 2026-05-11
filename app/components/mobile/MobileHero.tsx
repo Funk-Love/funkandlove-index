@@ -1,11 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
+import { oss } from "@/lib/cdn";
+
+const HERO_LQIP = "/images/team-bg-lqip.webp";
 import { fadeInUp } from "@/lib/animations";
 
 export default function MobileHero() {
+  const [bgLoaded, setBgLoaded] = useState(false);
   const scrollToNext = () => {
     document
       .getElementById("mobile-team-info")
@@ -17,13 +22,25 @@ export default function MobileHero() {
       id="mobile-hero"
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 py-16"
     >
-      {/* 背景图 */}
+      {/* 背景图 + LQIP 兜底 */}
       <div className="absolute inset-0 z-0">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${HERO_LQIP})`,
+            filter: "blur(20px)",
+            transform: "scale(1.1)",
+          }}
+        />
         <img
-          src={SITE_CONFIG.images.hero}
+          src={oss(SITE_CONFIG.images.hero)}
           alt=""
           aria-hidden="true"
-          className="w-full h-full object-cover object-center"
+          onLoad={() => setBgLoaded(true)}
+          className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
+            bgLoaded ? "opacity-100" : "opacity-0"
+          }`}
         />
         <div className="absolute inset-0 bg-black/60" />
       </div>
@@ -42,7 +59,7 @@ export default function MobileHero() {
           variants={fadeInUp}
           initial="initial"
           animate="animate"
-          src="/icon.png"
+          src={oss("/icon.png")}
           alt="Funk & Love Logo"
           className="w-28 h-28 object-contain mb-6"
           style={{

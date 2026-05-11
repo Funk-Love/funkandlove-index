@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
+import { oss } from "@/lib/cdn";
 import RecruitDialog from "./shared/RecruitDialog";
 
 // Toast 组件
@@ -126,7 +127,7 @@ export default function Navigation() {
               <div className="relative w-8 h-8 md:w-10 md:h-10">
                 {/* 未滚动 - 默认白色 */}
                 <img
-                  src="/icon.png"
+                  src={oss("/icon.png")}
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-0" : "opacity-100 group-hover:opacity-0"
@@ -134,7 +135,7 @@ export default function Navigation() {
                 />
                 {/* 未滚动 - hover 浅紫色 */}
                 <img
-                  src="/icon-lightpurple.png"
+                  src={oss("/icon-lightpurple.png")}
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-0" : "opacity-0 group-hover:opacity-100"
@@ -142,7 +143,7 @@ export default function Navigation() {
                 />
                 {/* 滚动后 - 默认黑色 */}
                 <img
-                  src="/icon-black.png"
+                  src={oss("/icon-black.png")}
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-100 group-hover:opacity-0" : "opacity-0"
@@ -150,7 +151,7 @@ export default function Navigation() {
                 />
                 {/* 滚动后 - hover 深紫色 */}
                 <img
-                  src="/icon-darkpurple.png"
+                  src={oss("/icon-darkpurple.png")}
                   alt="Funk & Love Logo"
                   className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
                     isScrolled ? "opacity-0 group-hover:opacity-100" : "opacity-0"

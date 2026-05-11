@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { oss } from '@/lib/cdn';
 
 interface ImagePlaceholderProps {
   src?: string;
@@ -69,7 +70,7 @@ export default function ImagePlaceholder({
       
       {/* 图片 */}
       <Image
-        src={src}
+        src={oss(src)!}
         alt={alt}
         width={!fill ? width : undefined}
         height={!fill ? height : undefined}

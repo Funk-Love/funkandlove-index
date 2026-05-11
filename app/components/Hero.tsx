@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { SITE_CONFIG } from '@/lib/constants';
 import { fadeInUp, floatUp } from '@/lib/animations';
-import { useRef, useEffect, useSyncExternalStore } from 'react';
+import { useRef, useEffect, useState, useSyncExternalStore } from 'react';
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
+import { oss } from '@/lib/cdn';
 import TextMorphAnimation from './TextMorphAnimation';
 
 const subscribeViewport = (callback: () => void) => {
@@ -24,6 +25,24 @@ export default function Hero() {
     getServerIsMobileSnapshot
   );
   const gradientLayerRef = useRef<HTMLDivElement>(null);
+
+  // 等首屏资源就位再淡入彩色蒙版,避免 mousemove 前的默认透明度
+  // (满 opacity)与未加载完的背景图叠加产生闪烁。
+  const [overlayReady, setOverlayReady] = useState(false);
+  useEffect(() => {
+    let rafId: number | null = null;
+    const markReady = () => setOverlayReady(true);
+
+    if (document.readyState === 'complete') {
+      rafId = requestAnimationFrame(markReady);
+      return () => {
+        if (rafId !== null) cancelAnimationFrame(rafId);
+      };
+    }
+
+    window.addEventListener('load', markReady);
+    return () => window.removeEventListener('load', markReady);
+  }, []);
 
   // 鼠标驱动的渐变角度/透明度：rAF 节流，直接写 CSS 变量，不触发 React 重渲染
   useEffect(() => {
@@ -88,8 +107,13 @@ export default function Hero() {
       <div className="absolute inset-0 z-0 bg-black/30" />
 
       {/* 渐变叠加层 - 中速滚动，鼠标跟随线性渐变，距离控制透明度 */}
+      {/* 外层 wrapper 处理"首屏资源就位再淡入"的时序;内层 div 由鼠标驱动 opacity。两者相乘生效。 */}
       <motion.div
         className="absolute inset-0 z-10"
+        style={{
+          opacity: overlayReady ? 1 : 0,
+          transition: 'opacity 600ms ease-out',
+        }}
       >
         <div
           ref={gradientLayerRef}
@@ -117,7 +141,7 @@ export default function Hero() {
           className="mb-8 flex justify-center"
         >
           <Image
-            src="/icon.png"
+            src={oss('/icon.png')!}
             alt="Funk & Love Logo"
             width={192}
             height={192}

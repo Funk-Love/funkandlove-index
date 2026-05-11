@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useCallback, useRef } from "react";
+import SectionHeader from "./ui/SectionHeader";
 
 const CONFIG_URL = "/images/team-config.json";
 
@@ -171,12 +172,14 @@ export default function Team() {
         viewport={{ once: true }}
         className="absolute top-24 left-0 right-0 z-20 text-center pointer-events-none"
       >
-        <h2 className="font-bold text-white mb-3 drop-shadow-lg text-[clamp(1.75rem,5.5vh,3.75rem)]">
-          我们的团队
-        </h2>
-        <p className="text-white/80 drop-shadow-md text-[clamp(0.95rem,2vh,1.125rem)]">
-          将鼠标悬停在成员上查看名字
-        </p>
+        <SectionHeader
+          index={2}
+          eyebrow="team"
+          title="我们的团队"
+          subtitle="将鼠标悬停在成员上查看名字"
+          theme="dark"
+          align="center"
+        />
       </motion.div>
 
       {/* 悬浮名字标签 */}

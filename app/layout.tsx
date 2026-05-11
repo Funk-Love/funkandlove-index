@@ -47,12 +47,18 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/images/team-bg.jpg"
+          href="/images/team-bg-lqip.webp"
+          fetchPriority="high"
         />
         <link
           rel="preload"
           as="image"
-          href="/icon.png"
+          href="/images/team-bg.jpg?x-oss-process=image/resize,w_3840,limit_1/format,webp/quality,Q_100"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/icon.png?x-oss-process=image/resize,w_3840,limit_1/format,webp/quality,Q_100"
         />
       </head>
       <body className="antialiased">

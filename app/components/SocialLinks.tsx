@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { SITE_CONFIG } from "@/lib/constants";
 import { fadeInUp } from "@/lib/animations";
+import SectionHeader from "./ui/SectionHeader";
 
 /**
  * 社交媒体平台品牌色配置
@@ -46,12 +47,14 @@ export default function SocialLinks() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="font-bold text-white mb-4 text-[clamp(1.875rem,5.5vh,3rem)]">
-            关注我们
-          </h2>
-          <p className="text-neutral-400 text-[clamp(0.95rem,2vh,1.125rem)]">
-            在社交媒体上了解更多精彩内容
-          </p>
+          <SectionHeader
+            index={6}
+            eyebrow="follow"
+            title="关注我们"
+            subtitle="在社交媒体上了解更多精彩内容"
+            theme="dark"
+            align="center"
+          />
         </motion.div>
 
         {/* 社交媒体图标 */}

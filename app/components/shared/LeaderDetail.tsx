@@ -2,6 +2,7 @@
 
 import { Crown } from "lucide-react";
 import type { Leader } from "@/lib/types";
+import { asset } from "@/lib/cdn";
 import { getRoleBadgeStyle } from "./leaderStyles";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
  */
 export default function LeaderDetail({ leader }: Props) {
   const isFounder = leader.role === "founder";
+  const imageSrc = asset(leader.image);
 
   return (
     <>
@@ -25,7 +27,7 @@ export default function LeaderDetail({ leader }: Props) {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: `url(${leader.image})`,
+            backgroundImage: `url(${imageSrc})`,
             backgroundPosition: `center ${leader.modalY || "50%"}`,
           }}
         />
