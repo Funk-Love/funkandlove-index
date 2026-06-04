@@ -2,7 +2,11 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect, useCallback, useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import SectionHeader from "./ui/SectionHeader";
+
+gsap.registerPlugin(useGSAP);
 
 const CONFIG_URL = "/images/team-config.json";
 
@@ -27,10 +31,24 @@ interface TeamConfig {
 export default function Team() {
   const [config, setConfig] = useState<TeamConfig | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [transform, setTransform] = useState({ scale: 1, offsetX: 0, offsetY: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
+
+  // 浮动名字标签跟随鼠标：用 gsap.quickTo 走 transform 平滑跟随，
+  // 不再每次 mousemove setState 重渲染整个 Team。
+  useGSAP(() => {
+    if (!labelRef.current) return;
+    const xTo = gsap.quickTo(labelRef.current, "x", { duration: 0.25, ease: "power3" });
+    const yTo = gsap.quickTo(labelRef.current, "y", { duration: 0.25, ease: "power3" });
+    const onMove = (e: MouseEvent) => {
+      xTo(e.clientX + 15);
+      yTo(e.clientY + 15);
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
 
   // 检测 section 是否在视口中，离开时清除 hover 状态
   useEffect(() => {
@@ -131,10 +149,6 @@ export default function Team() {
     return `${offsetX} ${offsetY} ${viewWidth} ${viewHeight}`;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
   return (
     <div ref={sectionRef} className="relative h-screen w-full overflow-hidden">
       {/* SVG 轮廓层 - fixed 定位与背景图对齐，仅在 section 可见时启用 */}
@@ -143,7 +157,6 @@ export default function Team() {
           className="fixed inset-0 w-full h-full z-10"
           viewBox={getViewBox()}
           preserveAspectRatio="none"
-          onMouseMove={handleMouseMove}
         >
           {Object.entries(memberGroups).map(([name, group]) =>
             group.contours.map((contour, idx) => (
@@ -182,22 +195,20 @@ export default function Team() {
         />
       </motion.div>
 
-      {/* 悬浮名字标签 */}
-      {hoveredMember && (
-        <motion.div
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed z-50 px-4 py-2 rounded-lg text-white font-medium pointer-events-none backdrop-blur-md"
-          style={{
-            left: mousePos.x + 15,
-            top: mousePos.y + 15,
-            background: "rgba(0, 0, 0, 0.7)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-          }}
-        >
-          {hoveredMember}
-        </motion.div>
-      )}
+      {/* 悬浮名字标签 - 常驻 DOM，位置由 gsap.quickTo 驱动(transform)，
+          仅用 opacity 显隐，避免 mousemove 重渲染。 */}
+      <div
+        ref={labelRef}
+        className={`fixed left-0 top-0 z-50 px-4 py-2 rounded-lg text-white font-medium pointer-events-none backdrop-blur-md transition-opacity duration-200 ${
+          hoveredMember ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          background: "rgba(0, 0, 0, 0.7)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+        }}
+      >
+        {hoveredMember}
+      </div>
     </div>
   );
 }

@@ -1,14 +1,18 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { Music, Heart, Users, Flame, Scale, LucideIcon } from 'lucide-react';
 import Card from './ui/Card';
 import SectionHeader from './ui/SectionHeader';
 import ImagePlaceholder from './ui/ImagePlaceholder';
 import { SITE_CONFIG } from '@/lib/constants';
 import { staggerContainer, cardItem } from '@/lib/animations';
-import { useMousePosition, getMouseInfluence, interpolateColor } from '@/lib/gradients';
+import { getMouseInfluence, interpolateColor } from '@/lib/gradients';
+
+gsap.registerPlugin(useGSAP);
 
 // Icon mapping - 将字符串映射到实际的 Lucide 图标组件
 const iconMap: Record<string, LucideIcon> = {
@@ -19,104 +23,62 @@ const iconMap: Record<string, LucideIcon> = {
   Scale,
 };
 
-interface CardPosition {
-  x: number;
-  y: number;
-}
+// 按鼠标与卡片中心的距离插值图标颜色（沿用原配色分层）。
+const iconColorFor = (influence: number) => {
+  if (influence > 0.7) return interpolateColor('#8b5cf6', '#ec4899', (influence - 0.7) / 0.3);
+  if (influence > 0.4) return interpolateColor('#3b82f6', '#8b5cf6', (influence - 0.4) / 0.3);
+  return interpolateColor('#10b981', '#3b82f6', influence / 0.4);
+};
 
 export default function TeamFeatures() {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
-  
-  // 追踪鼠标位置
-  const mousePosition = useMousePosition();
-  
-  // 存储每个卡片的位置
-  const [cardPositions, setCardPositions] = useState<CardPosition[]>([]);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // 计算并存储卡片位置
-  useEffect(() => {
-    const updatePositions = () => {
-      const positions = cardRefs.current.map((ref) => {
-        if (!ref) return { x: 0, y: 0 };
-        const rect = ref.getBoundingClientRect();
-        return {
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2,
-        };
-      });
-      setCardPositions(positions);
-    };
+  // 图标颜色跟随鼠标：直接用 gsap.quickSetter 写 DOM，不再经过 React 状态，
+  // 彻底消除原来每次 mousemove 重渲染整个 section 的开销。
+  useGSAP(
+    () => {
+      const root = containerRef.current;
+      if (!root) return;
 
-    // 初始计算
-    updatePositions();
+      const cards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('.feature-card'));
+      const icons = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('.feature-icon'));
+      const setColor = icons.map((el) => gsap.quickSetter(el, 'color'));
 
-    // resize 用 rAF 节流，避免拖拽窗口时高频触发布局计算 + setState
-    let rafId: number | null = null;
-    const onResize = () => {
-      if (rafId !== null) return;
-      rafId = requestAnimationFrame(() => {
+      // 初始颜色（influence=0）
+      setColor.forEach((set) => set(iconColorFor(0)));
+
+      let mx = -9999;
+      let my = -9999;
+      let rafId: number | null = null;
+
+      const paint = () => {
         rafId = null;
-        updatePositions();
-      });
-    };
+        // 先批量读取卡片中心（视口坐标，随滚动实时取，避免缓存失效），再批量写色，避免布局抖动。
+        const centers = cards.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        });
+        centers.forEach((c, i) => {
+          const influence = getMouseInfluence(mx, my, c.x, c.y, 400);
+          setColor[i]?.(iconColorFor(influence));
+        });
+      };
 
-    window.addEventListener('resize', onResize);
-    return () => {
-      window.removeEventListener('resize', onResize);
-      if (rafId !== null) cancelAnimationFrame(rafId);
-    };
-  }, []);
+      const onMove = (e: MouseEvent) => {
+        mx = e.clientX;
+        my = e.clientY;
+        if (rafId === null) rafId = requestAnimationFrame(paint);
+      };
 
-  // 计算每个卡片的动态样式
-  const getCardStyle = (index: number) => {
-    if (cardPositions.length === 0) return {};
-    
-    const cardPos = cardPositions[index];
-    const influence = getMouseInfluence(
-      mousePosition.x,
-      mousePosition.y,
-      cardPos.x,
-      cardPos.y,
-      400 // 最大影响距离
-    );
-
-    // 根据鼠标距离插值背景色
-    // 距离近时使用主色调，距离远时使用半透明白色
-    const backgroundColor = interpolateColor(
-      '#8b5cf6', // 紫色
-      '#ffffff',
-      1 - influence * 0.3 // 最多影响 30%
-    );
-
-    return {
-      backgroundColor: `${backgroundColor}${Math.round(10 + influence * 20).toString(16)}`, // 添加透明度
-    };
-  };
-
-  // 计算图标颜色
-  const getIconColor = (index: number) => {
-    if (cardPositions.length === 0) return '#8b5cf6';
-    
-    const cardPos = cardPositions[index];
-    const influence = getMouseInfluence(
-      mousePosition.x,
-      mousePosition.y,
-      cardPos.x,
-      cardPos.y,
-      400
-    );
-
-    // 根据鼠标距离在多个颜色间插值
-    if (influence > 0.7) {
-      return interpolateColor('#8b5cf6', '#ec4899', (influence - 0.7) / 0.3);
-    } else if (influence > 0.4) {
-      return interpolateColor('#3b82f6', '#8b5cf6', (influence - 0.4) / 0.3);
-    } else {
-      return interpolateColor('#10b981', '#3b82f6', influence / 0.4);
-    }
-  };
+      window.addEventListener('mousemove', onMove, { passive: true });
+      return () => {
+        window.removeEventListener('mousemove', onMove);
+        if (rafId !== null) cancelAnimationFrame(rafId);
+      };
+    },
+    { scope: containerRef }
+  );
 
   return (
     <section
@@ -166,39 +128,15 @@ export default function TeamFeatures() {
           >
             {SITE_CONFIG.features.map((feature, index) => {
               const IconComponent = iconMap[feature.icon];
-              
+
               return (
-                <motion.div
-                  key={index}
-                  ref={(el) => {
-                    cardRefs.current[index] = el;
-                  }}
-                  variants={cardItem}
-                >
-                  <Card
-                    className="p-6"
-                    style={getCardStyle(index)}
-                    hoverScale={true}
-                    hoverShadow={true}
-                  >
+                <motion.div key={index} variants={cardItem}>
+                  <Card className="p-6 feature-card" hoverScale={true} hoverShadow={true}>
                     <div className="flex items-start gap-4">
-                      {/* 图标 */}
-                      <motion.div
-                        className="flex-shrink-0"
-                        animate={{
-                          color: getIconColor(index),
-                        }}
-                        transition={{
-                          duration: 0.3,
-                        }}
-                      >
-                        {IconComponent && (
-                          <IconComponent
-                            size={40}
-                            strokeWidth={1.5}
-                          />
-                        )}
-                      </motion.div>
+                      {/* 图标 - 颜色由 gsap.quickSetter 直接驱动 */}
+                      <div className="feature-icon shrink-0">
+                        {IconComponent && <IconComponent size={40} strokeWidth={1.5} />}
+                      </div>
 
                       {/* 文字内容 */}
                       <div className="flex-1">

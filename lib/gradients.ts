@@ -1,5 +1,3 @@
-import { useState, useEffect, useRef } from "react";
-
 /**
  * RGB 颜色接口
  */
@@ -83,48 +81,6 @@ export function getDistanceFromMouse(
 }
 
 /**
- * 鼠标位置追踪 Hook
- * 实时追踪鼠标在页面上的位置
- * 
- * @returns 包含 x 和 y 坐标的对象
- * 
- * @example
- * const { x, y } = useMousePosition();
- * // x 和 y 会随鼠标移动实时更新
- */
-export function useMousePosition() {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const rafRef = useRef<number | null>(null);
-  const latestRef = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    // 用 rAF 节流：mousemove 浏览器以 100+Hz 触发，但渲染最多 60Hz，
-    // 同步 setState 会造成不必要的 React 重渲染，影响低端机性能。
-    const handleMouseMove = (e: MouseEvent) => {
-      latestRef.current.x = e.clientX;
-      latestRef.current.y = e.clientY;
-      if (rafRef.current !== null) return;
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
-        setPosition({ x: latestRef.current.x, y: latestRef.current.y });
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-  }, []);
-
-  return position;
-}
-
-/**
  * 计算鼠标影响强度
  * 根据鼠标与元素的距离计算影响强度（0-1）
  * 距离越近，强度越大
@@ -152,25 +108,6 @@ export function getMouseInfluence(
   // 距离越近，强度越大
   // 超过 maxDistance 时强度为 0
   const intensity = Math.max(0, 1 - distance / maxDistance);
-  
-  return intensity;
-}
 
-/**
- * 将鼠标位置转换为百分比
- * 用于 CSS 渐变定位
- * 
- * @param mouseX - 鼠标 X 坐标
- * @param mouseY - 鼠标 Y 坐标
- * @returns 包含 x 和 y 百分比的对象
- * 
- * @example
- * const { x, y } = getMousePercentage(960, 540);
- * // 在 1920x1080 屏幕上返回 { x: 50, y: 50 }
- */
-export function getMousePercentage(mouseX: number, mouseY: number) {
-  const x = (mouseX / window.innerWidth) * 100;
-  const y = (mouseY / window.innerHeight) * 100;
-  
-  return { x, y };
+  return intensity;
 }

@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 import { SITE_CONFIG } from "@/lib/constants";
-import { GENERATIONS } from "@/lib/data/members";
 
-const STATS = [
-  { value: SITE_CONFIG.memberCount, label: "队员" },
-  { value: `${GENERATIONS.length}`, label: "届" },
-  { value: "1", label: "团队精神" },
+const FACTS = [
+  { label: "所属组织", value: SITE_CONFIG.organization },
+  { label: "舞种", value: SITE_CONFIG.danceStyle },
+  { label: "规模", value: `${SITE_CONFIG.memberCount} 成员` },
+  { label: "理念", value: SITE_CONFIG.philosophy },
 ];
 
 export default function MobileTeamInfo() {
@@ -26,23 +26,45 @@ export default function MobileTeamInfo() {
         <h2 className="text-3xl font-bold text-white mb-3">关于我们</h2>
         <div className="w-12 h-1 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 mb-6" />
 
-        <p className="text-base leading-relaxed text-white/80 mb-10">
+        {/* Slogan */}
+        <p
+          className="font-light italic leading-[1.15] text-2xl mb-5"
+          style={{
+            backgroundImage:
+              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #fbbf24 100%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
+          }}
+        >
+          {SITE_CONFIG.slogan}
+        </p>
+
+        <p className="text-base leading-relaxed text-white/75 mb-8">
           {SITE_CONFIG.teamDescription}
         </p>
 
-        <div className="grid grid-cols-3 gap-3">
-          {STATS.map((s) => (
-            <div
-              key={s.label}
-              className="rounded-2xl bg-white/5 border border-white/10 p-4 text-center"
+        {/* 编号事实列 — 与桌面端同款,深色版 */}
+        <ul className="border-t border-white/15">
+          {FACTS.map((f, i) => (
+            <motion.li
+              key={f.label}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
+              className="flex items-baseline gap-3 py-3.5 border-b border-white/10"
             >
-              <div className="text-2xl font-bold bg-gradient-to-br from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                {s.value}
-              </div>
-              <div className="text-xs text-white/60 mt-1">{s.label}</div>
-            </div>
+              <span className="font-mono text-[11px] text-white/35 tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="text-sm text-white/55 min-w-14">{f.label}</span>
+              <span className="text-white font-medium ml-auto text-right text-[15px]">
+                {f.value}
+              </span>
+            </motion.li>
           ))}
-        </div>
+        </ul>
       </motion.div>
     </section>
   );
