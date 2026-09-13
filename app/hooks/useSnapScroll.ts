@@ -1,7 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { NAV_HEIGHT } from '@/lib/constants';
+
+gsap.registerPlugin(ScrollToPlugin);
 
 interface UseSnapScrollOptions {
   sectionIds: string[];
@@ -25,40 +29,14 @@ export function useSnapScroll({
   const [currentIndex, setCurrentIndex] = useState(0);
   const isScrolling = useRef(false);
   const lastScrollTime = useRef(0);
-  const safetyTimerRef = useRef<number | null>(null);
+  // 当前正在播放的吸附动画（ScrollToPlugin tween），用于打断与卸载清理。
+  const scrollTweenRef = useRef<gsap.core.Tween | null>(null);
 
   const snapLast = snapEndIndex ?? sectionIds.length - 1;
 
-  const easeInOutCubic = (t: number): number => {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  };
-
   const releaseLock = useCallback(() => {
     isScrolling.current = false;
-    if (safetyTimerRef.current !== null) {
-      clearTimeout(safetyTimerRef.current);
-      safetyTimerRef.current = null;
-    }
   }, []);
-
-  const smoothScrollTo = useCallback((targetY: number, onComplete?: () => void) => {
-    const startY = window.scrollY;
-    const distance = targetY - startY;
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeInOutCubic(progress);
-      window.scrollTo(0, startY + distance * eased);
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        onComplete?.();
-      }
-    };
-    requestAnimationFrame(animate);
-  }, [duration]);
 
   const scrollToSection = useCallback((index: number) => {
     if (index < 0 || index >= sectionIds.length) return;
@@ -66,14 +44,20 @@ export function useSnapScroll({
     const element = document.getElementById(sectionIds[index]);
     if (!element) return;
 
+    // 打断上一段吸附（kill 不触发 onComplete，避免误解锁）
+    scrollTweenRef.current?.kill();
+
     isScrolling.current = true;
     setCurrentIndex(index);
 
-    if (safetyTimerRef.current !== null) clearTimeout(safetyTimerRef.current);
-    safetyTimerRef.current = window.setTimeout(releaseLock, duration + 400);
-
-    smoothScrollTo(element.offsetTop, releaseLock);
-  }, [sectionIds, smoothScrollTo, duration, releaseLock]);
+    scrollTweenRef.current = gsap.to(window, {
+      duration: duration / 1000,
+      // power2.inOut ≈ 原 easeInOutCubic（三次缓动）
+      ease: 'power2.inOut',
+      scrollTo: { y: element.offsetTop, autoKill: false },
+      onComplete: releaseLock,
+    });
+  }, [sectionIds, duration, releaseLock]);
 
   // 根据滚动位置判断当前 section（用于向下滚动）
   const getCurrentSectionIndex = useCallback(() => {
@@ -183,11 +167,12 @@ export function useSnapScroll({
     }
   }, [enabled, sectionIds.length, snapLast, getCurrentSectionIndex, scrollToSection]);
 
-  // 标签页切回前台时主动释放锁
+  // 标签页切回前台时主动释放锁（rAF/ticker 在后台暂停，吸附动画可能卡住）
   useEffect(() => {
     if (!enabled) return;
     const handleVisibility = () => {
       if (document.visibilityState === 'visible' && isScrolling.current) {
+        scrollTweenRef.current?.kill();
         releaseLock();
       }
     };
@@ -225,10 +210,10 @@ export function useSnapScroll({
     };
   }, [enabled, handleWheel, handleKeyDown]);
 
-  // 卸载时清理兜底定时器
+  // 卸载时杀掉在播的吸附动画
   useEffect(() => {
     return () => {
-      if (safetyTimerRef.current !== null) clearTimeout(safetyTimerRef.current);
+      scrollTweenRef.current?.kill();
     };
   }, []);
 

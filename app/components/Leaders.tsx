@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import { NAV_HEIGHT } from "@/lib/constants";
 import { LEADERS } from "@/lib/data/leaders";
 import type { Leader } from "@/lib/types";
@@ -10,19 +13,23 @@ import LeaderDetail from "./shared/LeaderDetail";
 import DetailSheet from "./shared/DetailSheet";
 import { getModalBorderStyle } from "./shared/leaderStyles";
 
+gsap.registerPlugin(useGSAP, ScrollTrigger);
+
 /**
- * 历年队长 Section - 使用原生滚动事件 + RAF 节流，sticky 横滚 scrolljacking。
+ * 历年队长 Section - 纵向滚动驱动横向滚动（sticky 横滚）。
+ * 横移由 ScrollTrigger scrub tween 直接驱动,避免每帧 setState 重渲染。
  */
 export default function Leaders() {
   const [selectedLeader, setSelectedLeader] = useState<Leader | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const horizontalTweenRef = useRef<gsap.core.Tween | null>(null);
+  // 弹窗(body 被锁成 fixed)期间冻结横移,避免 scrollY 归零导致跳回开头
+  const modalOpenRef = useRef(false);
   const [windowWidth, setWindowWidth] = useState(1200);
   const [windowHeight, setWindowHeight] = useState(800);
-  const [translateX, setTranslateX] = useState(0);
-  const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -45,64 +52,77 @@ export default function Leaders() {
   const CARD_GAP = Math.max(12, Math.round(windowWidth * 0.015));
   const TOTAL_WIDTH = LEADERS.length * (CARD_WIDTH + CARD_GAP);
   const SCROLL_DISTANCE = Math.max(0, TOTAL_WIDTH - windowWidth + 64);
-  // 确保容器高度足够滚动完整个内容，最小为 1.5 倍视口高度
-  const containerHeight = Math.max(windowHeight * 1.5, windowHeight + SCROLL_DISTANCE);
+  // 横移完成后再留一段"停留缓冲"仍 sticky 住,让完成点远离 sticky 释放点。
+  const DWELL = Math.round(windowHeight * 0.35);
+  // 确保容器高度足够滚动完整个内容 + 缓冲，最小为 1.5 倍视口高度
+  const containerHeight = Math.max(windowHeight * 1.5, windowHeight + SCROLL_DISTANCE + DWELL);
 
-  // 使用 RAF 节流的滚动处理
-  const handleScroll = useCallback(() => {
-    if (rafRef.current) return;
-
-    rafRef.current = requestAnimationFrame(() => {
-      if (!containerRef.current) {
-        rafRef.current = 0;
-        return;
-      }
-
-      const rect = containerRef.current.getBoundingClientRect();
-      // 考虑 navbar 高度，从 navbar 下方开始计算
-      const scrollStart = -rect.top + NAV_HEIGHT;
-      const scrollEnd = containerHeight - window.innerHeight;
-      const scrollProgress =
-        scrollEnd > 0 ? Math.max(0, Math.min(1, scrollStart / scrollEnd)) : 0;
-
-      setTranslateX(-scrollProgress * SCROLL_DISTANCE);
-      setProgress(scrollProgress * 100);
-      rafRef.current = 0;
-    });
-  }, [containerHeight, SCROLL_DISTANCE]);
-
-  // IntersectionObserver 检测可见性
+  // IntersectionObserver 检测可见性（仅驱动标题入场）
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
+      ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
     );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
+    if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
 
-  // 只在可见且无模态框时监听滚动
-  // 模态框打开会让 body 变 fixed，scrollY 行为变化会导致 translateX 跳变 → 视觉上闪烁
-  useEffect(() => {
-    if (!isVisible || selectedLeader !== null) return;
+  // ScrollTrigger：纵向滚动驱动卡片行横移 + 进度条。
+  // 横移必须是一个 top-level scroll-linked tween，并使用 ease:"none"，
+  // 让滚动进度和横向位置保持 1:1，避免 quickTo 滞后追赶造成尾段闪动。
+  useGSAP(
+    () => {
+      const container = containerRef.current;
+      const cards = scrollContainerRef.current;
+      const bar = progressBarRef.current;
+      if (!container || !cards || !bar) return;
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // 初始计算
+      // 横移距离实时按卡片行实际宽度算(卡片宽度随视口变)
+      const distance = () => Math.max(0, cards.scrollWidth - window.innerWidth + 64);
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = 0;
-      }
-    };
-  }, [isVisible, handleScroll, selectedLeader]);
+      const tween = gsap.to(cards, {
+        x: () => -distance(),
+        ease: "none",
+        overwrite: "auto",
+        scrollTrigger: {
+          trigger: container,
+          start: `top ${NAV_HEIGHT}px`,
+          // 横移在 distance 内走完;之后 DWELL 段仍 sticky 停留,给尾部阅读留缓冲。
+          end: () => `+=${distance()}`,
+          scrub: true,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            if (modalOpenRef.current) return; // 弹窗期冻结进度条,防跳回开头
+            bar.style.width = `${self.progress * 100}%`;
+          },
+        },
+      });
+      horizontalTweenRef.current = tween;
+
+      return () => {
+        horizontalTweenRef.current = null;
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      };
+    },
+    { dependencies: [windowWidth, windowHeight], scope: containerRef, revertOnUpdate: true }
+  );
+
+  // 打开详情：先置冻结标志(早于 body 被锁成 fixed),暂停横滚同步。
+  const openLeader = (leader: Leader) => {
+    modalOpenRef.current = true;
+    horizontalTweenRef.current?.pause();
+    setSelectedLeader(leader);
+  };
+  const closeLeader = () => {
+    setSelectedLeader(null);
+    // 等 body 解锁、scrollY 恢复后再解冻 + 重算
+    requestAnimationFrame(() => {
+      modalOpenRef.current = false;
+      ScrollTrigger.refresh();
+      horizontalTweenRef.current?.resume();
+    });
+  };
 
   return (
     <>
@@ -136,10 +156,7 @@ export default function Leaders() {
             <div
               ref={scrollContainerRef}
               className="flex will-change-transform"
-              style={{
-                transform: `translateX(${translateX}px)`,
-                gap: `${CARD_GAP}px`,
-              }}
+              style={{ gap: `${CARD_GAP}px` }}
             >
               {LEADERS.map((leader, index) => {
                 const isFounder = leader.role === "founder";
@@ -158,7 +175,7 @@ export default function Leaders() {
                     width={cardWidth}
                     height={cardHeight}
                     priority={index < 5}
-                    onClick={() => setSelectedLeader(leader)}
+                    onClick={() => openLeader(leader)}
                   />
                 );
               })}
@@ -172,8 +189,9 @@ export default function Leaders() {
               </div>
               <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-[width] duration-100"
-                  style={{ width: `${progress}%` }}
+                  ref={progressBarRef}
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                  style={{ width: "0%" }}
                 />
               </div>
             </div>
@@ -183,7 +201,7 @@ export default function Leaders() {
 
       <DetailSheet
         open={selectedLeader !== null}
-        onClose={() => setSelectedLeader(null)}
+        onClose={closeLeader}
         variant="modal"
         panelClassName={`relative max-w-2xl w-full bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border ${
           selectedLeader ? getModalBorderStyle(selectedLeader.role) : "border-white/10"

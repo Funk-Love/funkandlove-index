@@ -5,7 +5,6 @@ import {
   Users, 
   Camera,
   Flame,
-  Heart,
   Crown, 
   UserCircle, 
   Share2,

@@ -30,6 +30,13 @@ const iconColorFor = (influence: number) => {
   return interpolateColor('#10b981', '#3b82f6', influence / 0.4);
 };
 
+// 卡片背景 tint：静止(influence=0)≈ 原 bg-white/10，鼠标靠近时偏紫并略加深。
+const cardBgFor = (influence: number) => {
+  const rgb = interpolateColor('#ffffff', '#8b5cf6', influence);
+  const alpha = (0.1 + influence * 0.12).toFixed(3);
+  return rgb.replace('rgb(', 'rgba(').replace(')', `, ${alpha})`);
+};
+
 export default function TeamFeatures() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
@@ -44,9 +51,11 @@ export default function TeamFeatures() {
       const cards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('.feature-card'));
       const icons = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('.feature-icon'));
       const setColor = icons.map((el) => gsap.quickSetter(el, 'color'));
+      const setBg = cards.map((el) => gsap.quickSetter(el, 'backgroundColor'));
 
-      // 初始颜色（influence=0）
+      // 初始值（influence=0）
       setColor.forEach((set) => set(iconColorFor(0)));
+      setBg.forEach((set) => set(cardBgFor(0)));
 
       let mx = -9999;
       let my = -9999;
@@ -62,6 +71,7 @@ export default function TeamFeatures() {
         centers.forEach((c, i) => {
           const influence = getMouseInfluence(mx, my, c.x, c.y, 400);
           setColor[i]?.(iconColorFor(influence));
+          setBg[i]?.(cardBgFor(influence));
         });
       };
 

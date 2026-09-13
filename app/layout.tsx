@@ -1,5 +1,18 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+/**
+ * Inter 可变字体,本地自托管(app/fonts/,latin 子集,300-900 字重)。
+ * 之前走字节镜像 fonts.bytedance.com,该服务已下线(404),线上一直回退到 system-ui。
+ * 通过 --font-inter 变量暴露给 globals.css。
+ */
+const inter = localFont({
+  src: "./fonts/Inter-variable.woff2",
+  weight: "300 900",
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -27,22 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" className={inter.variable}>
       <head>
-        <link
-          rel="stylesheet"
-          href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/css/fontawesome.min.css"
-        />
-        {/* Inter 字体 - 字节镜像 */}
-        <link
-          rel="preconnect"
-          href="https://fonts.bytedance.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.bytedance.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
-        />
         {/* 预加载关键图片 */}
         <link
           rel="preload"
