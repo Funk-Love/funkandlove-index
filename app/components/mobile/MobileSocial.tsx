@@ -1,74 +1,95 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS } from "@/lib/constants";
+import { getIcon } from "@/lib/icons";
+import { platformColor } from "@/lib/brand";
+import { useReveal } from "../../hooks/useReveal";
+import SectionHeader from "../ui/SectionHeader";
 
-const PLATFORM_COLORS: Record<string, string> = {
-  抖音: "#fe2c55",
-  微信视频号: "#07c160",
-  B站: "#00a1d6",
-  Instagram: "#e4405f",
-};
+interface Props {
+  onJoinClick?: () => void;
+}
 
 const ACTIVITIES = NAV_LINKS.find((l) => l.id === "activities")?.subLinks ?? [];
 const MERCH = NAV_LINKS.find((l) => l.id === "merch")?.subLinks ?? [];
 const PRODUCTS = NAV_LINKS.find((l) => l.id === "products")?.subLinks ?? [];
 
 const GROUPS = [
-  { title: "活动", links: ACTIVITIES },
-  { title: "周边", links: MERCH },
-  { title: "产品", links: PRODUCTS },
+  { title: "活动", eyebrow: "events", links: ACTIVITIES },
+  { title: "周边", eyebrow: "merch", links: MERCH },
+  { title: "产品", eyebrow: "products", links: PRODUCTS },
 ];
 
-export default function MobileSocial() {
+/**
+ * 关注我们(舞台深棕,页尾):社媒 2×2 卡 → 活动 / 周边 / 产品外链列表 → 加入我们 CTA → 页脚。
+ * 社媒图标用平台品牌色(lib/brand),筹备中的卡整体压暗并挂芥末"筹备中"小签。
+ */
+export default function MobileSocial({ onJoinClick }: Props) {
+  const ref = useReveal<HTMLElement>();
+
   return (
-    <section className="relative bg-gradient-to-b from-neutral-950 to-black px-6 py-16">
+    <section
+      id="social"
+      ref={ref}
+      className="relative bg-stage text-paper paper-grain-dark px-6 pt-16 pb-10 scroll-mt-4 focus:outline-none"
+    >
       <div className="max-w-md mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-2">关注我们</h2>
-        <p className="text-sm text-white/60 mb-8">
-          在社交媒体上了解更多精彩内容
-        </p>
+        <SectionHeader
+          index={6}
+          eyebrow="follow"
+          title="关注我们"
+          subtitle="在社交媒体上了解更多精彩内容"
+          theme="dark"
+          className="mb-8"
+        />
 
         {/* 社交矩阵 */}
-        <div className="grid grid-cols-4 gap-3 mb-10">
+        <div className="grid grid-cols-2 gap-3 mb-12">
           {SITE_CONFIG.socialLinks.map((link) => {
-            const Icon = link.icon;
+            const Icon = getIcon(link.icon);
             const disabled = link.isComingSoon || !link.url;
-            const color = PLATFORM_COLORS[link.platform] ?? "#8b5cf6";
+            const color = platformColor(link.platform);
             const inner = (
               <div
-                className={`relative flex flex-col items-center justify-center aspect-square rounded-2xl border transition-colors ${
+                className={`relative flex items-center gap-3 min-h-20 px-4 py-4 rounded-2xl border transition-colors ${
                   disabled
-                    ? "bg-neutral-900 border-white/5"
-                    : "bg-white/5 border-white/10 active:bg-white/10"
+                    ? "bg-stage-2/60 border-paper/10"
+                    : "bg-stage-2 border-paper/15 active:border-paper/40"
                 }`}
               >
-                <Icon
-                  className={`w-7 h-7 ${
-                    disabled ? "text-white/30" : "text-white"
-                  }`}
-                  strokeWidth={1.5}
-                  style={disabled ? undefined : { color }}
-                />
+                {Icon && (
+                  <Icon
+                    className={`w-7 h-7 shrink-0 ${disabled ? "text-paper/30" : ""}`}
+                    strokeWidth={1.75}
+                    style={disabled ? undefined : { color }}
+                  />
+                )}
                 <span
-                  className={`mt-1 text-[10px] ${
-                    disabled ? "text-white/30" : "text-white/70"
+                  className={`text-base font-bold leading-tight ${
+                    disabled ? "text-paper/40" : "text-paper"
                   }`}
                 >
                   {link.platform}
                 </span>
                 {link.isComingSoon && (
-                  <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 text-[9px] rounded-full bg-neutral-800 text-white/50 border border-white/10">
-                    筹备
+                  <span className="absolute -top-2 right-3 px-2 py-0.5 text-[10px] font-bold rounded-full bg-pop-500 text-ink">
+                    筹备中
                   </span>
+                )}
+                {!disabled && (
+                  <ArrowUpRight className="w-4 h-4 ml-auto text-paper/50 shrink-0" />
                 )}
               </div>
             );
             return disabled ? (
-              <div key={link.platform}>{inner}</div>
+              <div key={link.platform} data-reveal aria-disabled="true">
+                {inner}
+              </div>
             ) : (
               <a
                 key={link.platform}
+                data-reveal
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -80,52 +101,72 @@ export default function MobileSocial() {
           })}
         </div>
 
-        {/* 外链分组 */}
-        <div className="space-y-6">
+        {/* 外链分组:紧凑编辑部列表 */}
+        <div className="space-y-8">
           {GROUPS.map((g) => (
-            <div key={g.title}>
-              <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider mb-2">
-                {g.title}
-              </h3>
-              <div className="space-y-2">
+            <div key={g.title} data-reveal>
+              <div className="flex items-center gap-3 mb-1">
+                <h3 className="font-display text-xl text-paper">{g.title}</h3>
+                <span className="font-mono text-xs tracking-[0.12em] uppercase text-paper/50">
+                  {g.eyebrow}
+                </span>
+                <span className="h-px flex-1 bg-paper/20" aria-hidden />
+              </div>
+              <ul className="divide-y divide-paper/15">
                 {g.links.map((sub) => {
-                  const Icon = sub.icon;
+                  const Icon = getIcon(sub.icon);
                   return (
-                    <a
-                      key={sub.id}
-                      href={sub.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm active:bg-white/10 transition-colors"
-                    >
-                      <span className="flex items-center gap-2">
-                        {Icon && <Icon className="w-4 h-4 opacity-80" />}
-                        {sub.label}
-                      </span>
-                      <ExternalLink className="w-4 h-4 opacity-60" />
-                    </a>
+                    <li key={sub.id}>
+                      <a
+                        href={sub.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 min-h-12 py-3 text-paper text-base font-medium transition-colors active:text-pop-500"
+                      >
+                        {Icon && <Icon className="w-5 h-5 text-accent-400 shrink-0" strokeWidth={2} />}
+                        <span className="flex-1">{sub.label}</span>
+                        <ArrowUpRight className="w-4 h-4 text-paper/50 shrink-0" />
+                      </a>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
 
+        {/* 加入我们 CTA */}
+        <div data-reveal="lock" className="mt-12 rounded-2xl bg-stage-2 border border-paper/15 p-5">
+          <p className="font-display text-pop-500 text-2xl leading-tight mb-1">Lock with us.</p>
+          <p className="text-base text-paper/80 leading-relaxed mb-5">
+            不限基础,不限舞龄。欢迎每一位想跳 Locking 的你。
+          </p>
+          <button
+            type="button"
+            onClick={onJoinClick}
+            className="w-full inline-flex items-center justify-center min-h-12 px-6 py-3 rounded-full bg-action text-on-action text-lg font-bold border border-action shadow-action transition-[transform,translate,box-shadow] duration-150 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          >
+            加入我们
+          </button>
+        </div>
+
         {/* 版权 / 备案 */}
-        <div className="mt-10 text-center text-xs text-white/40 space-y-1">
-          <p>© 2025 Funk &amp; Love. All rights reserved.</p>
-          <p>建设者：Hofmann</p>
+        <footer className="mt-12 pt-6 border-t border-paper/15 text-center text-sm text-paper/50 space-y-1.5">
+          <p className="font-mono text-[11px] tracking-[0.2em] uppercase">
+            © {new Date().getFullYear()} Funk <span className="font-sans">&amp;</span> Love · All rights reserved
+          </p>
+          <p>建设者:Hofmann</p>
           <p>
             <a
               href="https://beian.miit.gov.cn"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white/60 transition-colors"
+              className="inline-flex items-center min-h-11 text-paper/50 underline-offset-4 active:text-paper active:underline transition-colors"
             >
               浙ICP备2025210475号
             </a>
           </p>
-        </div>
+        </footer>
       </div>
     </section>
   );

@@ -199,5 +199,9 @@ export const LEADERS: Leader[] = [
     bio: "25届lk副队长，电气工程专业，喜欢唱歌，偶尔追星，练习时长一年半。在舞队的时光会成为我大学生活最重要的记忆之一🥰",
     modalY: "30%",
     role: 'vice'
-  }
+  },
+  { id: "26-yixi", name: "乙烯", title: "队长", term: "26届", image: "/images/members/25届/乙烯.jpg", bio: "", role: "captain" },
+  { id: "26-jiangjiang", name: "姜姜", title: "副队长", term: "26届", image: "/images/members/25届/姜姜.jpg", bio: "", role: "vice" },
+  { id: "26-luobo", name: "萝卜", title: "副队长", term: "26届", image: "/images/members/25届/萝卜.jpg", cardX: "50%", bio: "", role: "vice" },
+  { id: "26-maotouying", name: "猫头鹰", title: "副队长", term: "26届", image: "/images/members/25届/猫头鹰.png", bio: "", role: "vice" }
 ];

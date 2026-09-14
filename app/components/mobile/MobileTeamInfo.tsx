@@ -1,7 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { Fragment } from "react";
 import { SITE_CONFIG } from "@/lib/constants";
+import { useReveal } from "../../hooks/useReveal";
+import SectionHeader from "../ui/SectionHeader";
+
+const SLOGAN_PHRASES = SITE_CONFIG.slogan.split(", ");
 
 const FACTS = [
   { label: "所属组织", value: SITE_CONFIG.organization },
@@ -10,62 +14,57 @@ const FACTS = [
   { label: "理念", value: SITE_CONFIG.philosophy },
 ];
 
+/**
+ * 关于我们(纸面):章节头 → 大 slogan(焦橙 display)→ 一段描述 → 编号事实表。
+ * 事实表走编辑部表格:mono 序号 / 灰标签 / 粗墨值,细墨线分隔,不做卡片。
+ */
 export default function MobileTeamInfo() {
+  const ref = useReveal<HTMLElement>();
+
   return (
     <section
-      id="mobile-team-info"
-      className="relative bg-neutral-950 px-6 py-16"
+      id="team-info"
+      ref={ref}
+      className="relative bg-paper text-ink paper-grain px-6 py-16 scroll-mt-4 focus:outline-none"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md mx-auto"
-      >
-        <h2 className="text-3xl font-bold text-white mb-3">关于我们</h2>
-        <div className="w-12 h-1 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 mb-6" />
+      <div className="max-w-md mx-auto">
+        <SectionHeader index={1} eyebrow="about" title="关于我们" theme="light" className="mb-8" />
 
-        {/* Slogan */}
+        {/* slogan 按逗号分短语,短语内不折行,窄屏只在短语之间断 */}
         <p
-          className="font-light italic leading-[1.15] text-2xl mb-5"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, #a78bfa 0%, #f472b6 55%, #fbbf24 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-          }}
+          data-reveal="lock"
+          className="font-display text-accent-600 leading-[1.1] text-[clamp(1.75rem,8vw,2.5rem)] mb-6"
         >
-          {SITE_CONFIG.slogan}
+          {SLOGAN_PHRASES.map((phrase, i) => (
+            <Fragment key={phrase}>
+              <span className="whitespace-nowrap">
+                {phrase}
+                {i < SLOGAN_PHRASES.length - 1 ? "," : ""}
+              </span>
+              {i < SLOGAN_PHRASES.length - 1 ? " " : null}
+            </Fragment>
+          ))}
         </p>
 
-        <p className="text-base leading-relaxed text-white/75 mb-8">
+        <p data-reveal className="text-base leading-relaxed text-ink-2 mb-8">
           {SITE_CONFIG.teamDescription}
         </p>
 
-        {/* 编号事实列 — 与桌面端同款,深色版 */}
-        <ul className="border-t border-white/15">
+        <dl data-reveal className="border-t-2 border-ink">
           {FACTS.map((f, i) => (
-            <motion.li
+            <div
               key={f.label}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
-              className="flex items-baseline gap-3 py-3.5 border-b border-white/10"
+              className="grid grid-cols-[2rem_5.5rem_1fr] items-baseline gap-3 py-4 border-b border-ink/15"
             >
-              <span className="font-mono text-[11px] text-white/35 tabular-nums">
+              <span className="font-mono text-[11px] text-ink-faint tabular-nums">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <span className="text-sm text-white/55 min-w-14">{f.label}</span>
-              <span className="text-white font-medium ml-auto text-right text-[15px]">
-                {f.value}
-              </span>
-            </motion.li>
+              <dt className="text-base text-ink-muted">{f.label}</dt>
+              <dd className="text-ink font-bold text-base text-right">{f.value}</dd>
+            </div>
           ))}
-        </ul>
-      </motion.div>
+        </dl>
+      </div>
     </section>
   );
 }

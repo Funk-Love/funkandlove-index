@@ -1,27 +1,26 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 /**
  * 锁定/解锁 body 滚动（用于模态框）
- * 通过 position: fixed 保留滚动位置，关闭后恢复
+ * 锁住根滚动容器，保留 scrollY 与 sticky / ScrollTrigger 的坐标系。
  */
 export function useBodyScrollLock(isLocked: boolean) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isLocked) return;
 
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
+    const root = document.documentElement;
+    const body = document.body;
+    const rootOverflow = root.style.overflow;
+    const bodyOverflow = body.style.overflow;
+    root.style.overflow = 'hidden';
+    // clip 不创建新的滚动容器，避免 sticky 改为相对 body 定位。
+    body.style.overflow = 'clip';
 
     return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, scrollY);
+      root.style.overflow = rootOverflow;
+      body.style.overflow = bodyOverflow;
     };
   }, [isLocked]);
 }

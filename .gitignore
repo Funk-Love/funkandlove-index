@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/_qa/
 
 # next.js
 /.next/

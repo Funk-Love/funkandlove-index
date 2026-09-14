@@ -1,121 +1,92 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import HeroBackdrop from "../hero/HeroBackdrop";
 import { ChevronDown } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants";
-import { oss } from "@/lib/cdn";
+import { useReveal } from "../../hooks/useReveal";
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import HeroExperience from "../hero/HeroExperience";
 
-const HERO_LQIP = "/images/team-bg-lqip.webp";
-import { fadeInUp } from "@/lib/animations";
+interface Props {
+  onJoinClick?: () => void;
+}
 
-export default function MobileHero() {
-  const [bgLoaded, setBgLoaded] = useState(false);
+/**
+ * 移动 Hero:深棕舞台(D4),不再铺合照底图。
+ * 纵向堆叠:左上 eyebrow → 黑胶主视觉(D9 插槽,约 60vw,靠右)→ 静态标题 → slogan → 一句话 → 两颗 CTA。
+ * 标题是静态字(移动端不跑 TextMorph),只借它的字体 / 字重 / 颜色(font-morph 固定 Inter)。
+ * 入场用 useReveal(首屏元素在挂载时即命中 ScrollTrigger,立刻依次揭示)。
+ */
+export default function MobileHero({ onJoinClick }: Props) {
+  const reducedMotion = usePrefersReducedMotion();
+  const ref = useReveal<HTMLElement>({ start: "top 100%" });
+
   const scrollToNext = () => {
     document
-      .getElementById("mobile-team-info")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      .getElementById("team-info")
+      ?.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "start" });
   };
 
   return (
     <section
-      id="mobile-hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 py-16"
+      id="hero"
+      ref={ref}
+      className="relative min-h-screen flex flex-col overflow-hidden bg-stage text-paper scroll-mt-4 focus:outline-none"
     >
-      {/* 背景图 + LQIP 兜底 */}
-      <div className="absolute inset-0 z-0">
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${HERO_LQIP})`,
-            filter: "blur(20px)",
-            transform: "scale(1.1)",
-          }}
-        />
-        <img
-          src={oss(SITE_CONFIG.images.hero)}
-          alt=""
-          aria-hidden="true"
-          onLoad={() => setBgLoaded(true)}
-          className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
-            bgLoaded ? "opacity-100" : "opacity-0"
-          }`}
-        />
-        <div className="absolute inset-0 bg-black/60" />
-      </div>
+      <HeroBackdrop />
+      <div className="mobile-hero-body relative z-10 flex-1 flex flex-col px-6 pt-8 pb-24">
+        {/* eyebrow:左上,给汉堡让出右侧 */}
+        <div data-reveal className="mobile-hero-eyebrow flex items-center gap-3 pr-14">
+          <span className="rule-accent rounded-full shrink-0" aria-hidden />
+          <span className="font-mono text-xs tracking-[0.08em] uppercase text-paper/60">
+            {SITE_CONFIG.organization} · Locking
+          </span>
+        </div>
 
-      {/* 渐变蒙层（静态，不跟手） */}
-      <div
-        className="absolute inset-0 z-10"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(139,92,246,0.4) 0%, rgba(236,72,153,0.4) 50%, rgba(245,158,11,0.4) 100%)",
-        }}
-      />
-
-      <div className="relative z-20 flex flex-col items-center text-center max-w-md w-full">
-        <motion.img
-          variants={fadeInUp}
-          initial="initial"
-          animate="animate"
-          src={oss("/icon.png")}
-          alt="Funk & Love Logo"
-          className="w-28 h-28 object-contain mb-6"
-          style={{
-            filter:
-              "drop-shadow(0 0 30px rgba(139,92,246,0.8)) drop-shadow(0 0 60px rgba(236,72,153,0.6))",
-          }}
-        />
-
-        <motion.h1
-          variants={fadeInUp}
-          initial="initial"
-          animate="animate"
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-5xl font-bold mb-4"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-            textShadow: "0 0 30px rgba(139,92,246,0.6)",
-          }}
+        <HeroExperience>
+        {/* 标题:静态 Funk & Love,与 TextMorph 终态同一字体 / 颜色 */}
+        <h1
+          data-reveal="lock"
+          className="font-morph font-bold text-paper leading-[0.95] tracking-tight text-[clamp(3rem,15vw,4.25rem)] mb-4"
         >
-          {SITE_CONFIG.name}
-        </motion.h1>
+          Funk<span className="font-sans text-pop-400">&amp;</span>Love
+        </h1>
 
-        <motion.p
-          variants={fadeInUp}
-          initial="initial"
-          animate="animate"
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-lg italic font-light text-white mb-3"
-          style={{ textShadow: "0 0 20px rgba(255,255,255,0.5)" }}
-        >
+        <p data-reveal className="font-display text-pop-500 text-[clamp(1.35rem,6vw,1.75rem)] leading-tight mb-4">
           {SITE_CONFIG.slogan}
-        </motion.p>
+        </p>
 
-        <motion.p
-          variants={fadeInUp}
-          initial="initial"
-          animate="animate"
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="text-base text-white/90 leading-relaxed"
-          style={{ textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}
-        >
-          {SITE_CONFIG.description}
-        </motion.p>
+        <p data-reveal className="text-paper/80 text-base leading-relaxed mb-8 max-w-prose">
+          {SITE_CONFIG.philosophy}。{SITE_CONFIG.description}，用充满律动的锁舞诠释放克精神。
+        </p>
+
+        <div data-reveal className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={onJoinClick}
+            className="inline-flex items-center min-h-11 px-6 py-3 rounded-full bg-action text-on-action font-bold border border-action shadow-action transition-[transform,translate,box-shadow,background-color] duration-200 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          >
+            加入我们
+          </button>
+          <button
+            type="button"
+            onClick={scrollToNext}
+            className="inline-flex items-center min-h-11 px-6 py-3 rounded-full text-paper font-bold border-2 border-paper/40 transition-colors duration-200 active:border-paper active:bg-paper/10"
+          >
+            认识我们
+          </button>
+        </div>
+        </HeroExperience>
       </div>
 
-      {/* 向下箭头 */}
+      {/* 向下滚动指示器 */}
       <button
+        type="button"
         onClick={scrollToNext}
-        aria-label="向下滚动"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-white/70 active:text-white p-2"
+        aria-label="滚动到下一部分"
+        className="mobile-hero-next absolute bottom-5 left-1/2 -translate-x-1/2 z-20 p-2 min-w-11 min-h-11 flex items-center justify-center text-paper/60 active:text-pop-500 transition-colors"
       >
-        <ChevronDown className="w-8 h-8 animate-bounce" strokeWidth={1.5} />
+        <ChevronDown className={`w-8 h-8 ${reducedMotion ? "" : "animate-bounce"}`} strokeWidth={1.75} />
       </button>
     </section>
   );

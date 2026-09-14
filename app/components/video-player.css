@@ -1,5 +1,5 @@
-/* Funk & Love Plyr 主题:只换主色,其余保留 Plyr 默认。 */
+/* Funk & Love Plyr 主题:主色走 accent token,其余保留 Plyr 默认。 */
 
 .plyr-funk {
-  --plyr-color-main: #ec4899;
+  --plyr-color-main: var(--color-accent-500);
 }

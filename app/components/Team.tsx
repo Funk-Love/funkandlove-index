@@ -1,213 +1,137 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { oss } from "@/lib/cdn";
 import SectionHeader from "./ui/SectionHeader";
 
 gsap.registerPlugin(useGSAP);
 
-const CONFIG_URL = "/images/team-config.json";
-
-interface TeamMember {
-  id: number;
-  name: string;
-  color: [number, number, number];
-  contour: [number, number][];
-}
-
 interface TeamConfig {
   width: number;
   height: number;
-  persons: TeamMember[];
+  persons: { name: string; contour: [number, number][] }[];
 }
 
-/**
- * 团队 Section
- * 背景图由 TeamPhotoBackground 提供
- * SVG 轮廓交互在这里实现（fixed 定位，与背景图对齐）
- */
+interface OutlineData {
+  viewBox: string;
+  members: { name: string; path: string }[];
+}
+
+// 相邻点中点间的二次曲线，消除像素轮廓的小折角；只在数据加载时计算。
+function smoothContour(points: [number, number][]) {
+  const midpoint = (a: number[], b: number[]) => `${(a[0] + b[0]) / 2},${(a[1] + b[1]) / 2}`;
+  return `M${midpoint(points[points.length - 1], points[0])}` +
+    points.map((point, i) => `Q${point.join(",")} ${midpoint(point, points[(i + 1) % points.length])}`).join(" ") + "Z";
+}
+
+/** SVG 自带的 slice 与图片 object-cover 对齐，无尺寸监听或滚动计算。 */
 export default function Team() {
-  const [config, setConfig] = useState<TeamConfig | null>(null);
-  const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const [transform, setTransform] = useState({ scale: 1, offsetX: 0, offsetY: 0 });
-  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
-
-  // 浮动名字标签跟随鼠标：用 gsap.quickTo 走 transform 平滑跟随，
-  // 不再每次 mousemove setState 重渲染整个 Team。
-  useGSAP(() => {
-    if (!labelRef.current) return;
-    const xTo = gsap.quickTo(labelRef.current, "x", { duration: 0.25, ease: "power3" });
-    const yTo = gsap.quickTo(labelRef.current, "y", { duration: 0.25, ease: "power3" });
-    const onMove = (e: MouseEvent) => {
-      xTo(e.clientX + 15);
-      yTo(e.clientY + 15);
-    };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  }, []);
-
-  // 检测 section 是否在视口中，离开时清除 hover 状态
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const visible = entry.isIntersecting;
-        setIsVisible(visible);
-        if (!visible) setHoveredMember(null); // 离开时清除 hover
-      },
-      { threshold: 0.3 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  // 加载配置
-  useEffect(() => {
-    fetch(CONFIG_URL)
-      .then((res) => res.json())
-      .then((data: TeamConfig) => setConfig(data))
-      .catch(() => {});
-  }, []);
-
-  // 计算 object-cover 的变换参数（与背景图保持一致）
-  const calculateTransform = useCallback(() => {
-    if (!config) return;
-    const containerWidth = window.innerWidth;
-    const containerHeight = window.innerHeight;
-    const imageWidth = config.width;
-    const imageHeight = config.height;
-
-    const containerRatio = containerWidth / containerHeight;
-    const imageRatio = imageWidth / imageHeight;
-
-    let scale: number;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (containerRatio > imageRatio) {
-      scale = containerWidth / imageWidth;
-      const scaledHeight = imageHeight * scale;
-      offsetY = (scaledHeight - containerHeight) / 2 / scale;
-    } else {
-      scale = containerHeight / imageHeight;
-      const scaledWidth = imageWidth * scale;
-      offsetX = (scaledWidth - containerWidth) / 2 / scale;
-    }
-
-    setTransform({ scale, offsetX, offsetY });
-  }, [config]);
+  const [outlines, setOutlines] = useState<OutlineData | null>(null);
+  const [activeName, setActiveName] = useState<string | null>(null);
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => calculateTransform());
-    window.addEventListener("resize", calculateTransform);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("resize", calculateTransform);
-    };
-  }, [calculateTransform]);
-
-  // 按名字分组成员
-  const memberGroups =
-    config?.persons.reduce(
-      (acc, person) => {
-        if (person.contour.length < 3) return acc;
-        if (!acc[person.name]) {
-          acc[person.name] = { color: person.color, contours: [] };
+    const controller = new AbortController();
+    fetch("/images/team-config.json", { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error("轮廓数据加载失败");
+        return res.json() as Promise<TeamConfig>;
+      })
+      .then((config) => {
+        const groups = new Map<string, string[]>();
+        for (const person of config.persons) {
+          if (person.contour.length < 3) continue;
+          const paths = groups.get(person.name) ?? [];
+          paths.push(smoothContour(person.contour));
+          groups.set(person.name, paths);
         }
-        acc[person.name].contours.push(person.contour);
-        return acc;
-      },
-      {} as Record<string, { color: [number, number, number]; contours: [number, number][][] }>
-    ) || {};
+        setOutlines({
+          viewBox: `0 0 ${config.width} ${config.height}`,
+          members: [...groups].map(([name, paths]) => ({ name, path: paths.join(" ") })),
+        });
+      })
+      .catch(() => { /* 合照独立显示，轮廓请求失败不阻断页面。 */ });
+    return () => controller.abort();
+  }, []);
 
-  // Catmull-Rom 平滑曲线
-  const contourToSmoothPath = (points: [number, number][]): string => {
-    if (points.length < 3) return "";
-    const tension = 0.3;
-    const n = points.length;
-    const pts = [points[n - 1], ...points, points[0], points[1]];
-    let d = `M ${points[0][0]},${points[0][1]}`;
-    for (let i = 1; i < pts.length - 2; i++) {
-      const p0 = pts[i - 1], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2];
-      const cp1x = p1[0] + (p2[0] - p0[0]) * tension;
-      const cp1y = p1[1] + (p2[1] - p0[1]) * tension;
-      const cp2x = p2[0] - (p3[0] - p1[0]) * tension;
-      const cp2y = p2[1] - (p3[1] - p1[1]) * tension;
-      d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`;
-    }
-    return d + " Z";
-  };
-
-  const getViewBox = () => {
-    if (!config) return "0 0 100 100";
-    const { offsetX, offsetY } = transform;
-    const viewWidth = window.innerWidth / transform.scale;
-    const viewHeight = window.innerHeight / transform.scale;
-    return `${offsetX} ${offsetY} ${viewWidth} ${viewHeight}`;
-  };
+  useGSAP(() => {
+    const section = sectionRef.current;
+    const label = labelRef.current;
+    if (!section || !label) return;
+    const mm = gsap.matchMedia();
+    mm.add({ fine: "(hover: hover) and (pointer: fine)", reduce: "(prefers-reduced-motion: reduce)", all: "all" }, (context) => {
+      const { fine, reduce } = context.conditions!;
+      const xTo = gsap.quickTo(label, "x", { duration: .16, ease: "power3.out" });
+      const yTo = gsap.quickTo(label, "y", { duration: .16, ease: "power3.out" });
+      let positioned = false;
+      const position = (x: number, y: number, immediate = false) => {
+        x = gsap.utils.clamp(12, Math.max(12, window.innerWidth - 208), x + 18);
+        y = gsap.utils.clamp(12, Math.max(12, window.innerHeight - 128), y + 18);
+        if (!positioned || reduce || immediate) {
+          xTo.tween.pause(); yTo.tween.pause();
+          gsap.set(label, { x, y });
+        } else { xTo(x); yTo(y); }
+        positioned = true;
+      };
+      const move = (event: PointerEvent) => {
+        if (fine && event.pointerType !== "touch") position(event.clientX, event.clientY);
+      };
+      const leave = () => { positioned = false; xTo.tween.pause(); yTo.tween.pause(); };
+      const focus = (event: FocusEvent) => {
+        const target = event.target;
+        if (!(target instanceof SVGElement) || !target.matches("[data-member]")) return;
+        if (fine && !target.matches(":focus-visible")) return;
+        const rect = target.getBoundingClientRect();
+        position(rect.left + rect.width / 2, rect.top + rect.height / 2, true);
+      };
+      section.addEventListener("pointermove", move, { passive: true });
+      section.addEventListener("pointerleave", leave);
+      section.addEventListener("focusin", focus);
+      return () => {
+        section.removeEventListener("pointermove", move);
+        section.removeEventListener("pointerleave", leave);
+        section.removeEventListener("focusin", focus);
+      };
+    });
+    const visibility = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) setActiveName(null);
+    });
+    visibility.observe(section);
+    return () => { visibility.disconnect(); mm.revert(); };
+  }, { scope: sectionRef });
 
   return (
-    <div ref={sectionRef} className="relative h-screen w-full overflow-hidden">
-      {/* SVG 轮廓层 - fixed 定位与背景图对齐，仅在 section 可见时启用 */}
-      {config && isVisible && (
-        <svg
-          className="fixed inset-0 w-full h-full z-10"
-          viewBox={getViewBox()}
-          preserveAspectRatio="none"
-        >
-          {Object.entries(memberGroups).map(([name, group]) =>
-            group.contours.map((contour, idx) => (
-              <path
-                key={`${name}-${idx}`}
-                d={contourToSmoothPath(contour)}
-                className="cursor-pointer transition-all duration-200"
-                style={{
-                  fill: hoveredMember === name ? "rgba(255, 255, 255, 0.15)" : "transparent",
-                  stroke: hoveredMember === name ? "rgba(255, 255, 255, 0.8)" : "transparent",
-                  strokeWidth: 2 / transform.scale,
-                  pointerEvents: "auto",
-                }}
-                onMouseEnter={() => setHoveredMember(name)}
-                onMouseLeave={() => setHoveredMember(null)}
-              />
-            ))
-          )}
+    <div ref={sectionRef} onPointerLeave={() => setActiveName(null)} className="relative h-screen w-full overflow-hidden bg-stage">
+      <Image
+        src={oss("/images/team-bg.jpg")!}
+        alt="Funk & Love 团队合照"
+        fill
+        sizes="100vw"
+        loading="eager"
+        className="object-cover object-center"
+      />
+      <div className="absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-stage/85 via-stage/40 to-transparent pointer-events-none" />
+      {outlines && (
+        <svg className="absolute inset-0 h-full w-full overflow-hidden"
+          viewBox={outlines.viewBox} preserveAspectRatio="xMidYMid slice">
+          {outlines.members.map(({ name, path }) => (
+            <path key={name} d={path} data-member tabIndex={0} role="img" aria-label={name}
+              strokeWidth={2} vectorEffect="non-scaling-stroke"
+              className="outline-none cursor-pointer fill-transparent stroke-transparent hover:fill-pop-500/20 hover:stroke-pop-500 focus-visible:fill-pop-500/20 focus-visible:stroke-pop-500 transition-[fill,stroke] duration-150 motion-reduce:transition-none"
+              onMouseEnter={() => setActiveName(name)} onMouseLeave={() => setActiveName(null)}
+              onFocus={() => setActiveName(name)} onBlur={() => setActiveName(null)} />
+          ))}
         </svg>
       )}
-
-      {/* 标题 */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="absolute top-24 left-0 right-0 z-20 text-center pointer-events-none"
-      >
-        <SectionHeader
-          index={2}
-          eyebrow="team"
-          title="我们的团队"
-          subtitle="将鼠标悬停在成员上查看名字"
-          theme="dark"
-          align="center"
-        />
-      </motion.div>
-
-      {/* 悬浮名字标签 - 常驻 DOM，位置由 gsap.quickTo 驱动(transform)，
-          仅用 opacity 显隐，避免 mousemove 重渲染。 */}
-      <div
-        ref={labelRef}
-        className={`fixed left-0 top-0 z-50 px-4 py-2 rounded-lg text-white font-medium pointer-events-none backdrop-blur-md transition-opacity duration-200 ${
-          hoveredMember ? "opacity-100" : "opacity-0"
-        }`}
-        style={{
-          background: "rgba(0, 0, 0, 0.7)",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-        }}
-      >
-        {hoveredMember}
+      <div className="absolute top-24 left-0 right-0 text-center px-6 pointer-events-none">
+        <SectionHeader index={2} eyebrow="team" title="我们的团队" subtitle="将鼠标悬停在成员上查看名字" theme="dark" align="center" />
+      </div>
+      <div ref={labelRef} aria-hidden="true" className={`fixed left-0 top-0 z-50 max-w-48 rounded-sm border border-ink/20 bg-paper px-4 py-2 text-lg font-semibold text-ink shadow-paper-sm pointer-events-none transition-opacity duration-150 motion-reduce:transition-none ${activeName ? "opacity-100" : "opacity-0"}`}>
+        {activeName ?? "\u00a0"}
       </div>
     </div>
   );

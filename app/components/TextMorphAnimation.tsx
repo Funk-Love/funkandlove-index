@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useImperativeHandle, useRef, type Ref } from 'react';
 import gsap from 'gsap';
 import { Flip } from 'gsap/Flip';
 import { useGSAP } from '@gsap/react';
@@ -22,7 +22,7 @@ const LETTERS: Letter[] = [
   { id: 'oc', text: 'oc' },
   { id: 'k', text: 'k' },
   { id: 'ing', text: 'ing' },
-  { id: 'amp', text: '&', className: 'text-pink-400' },
+  { id: 'amp', text: '&', className: 'text-pop-400' },
   { id: 'ove', text: 'ove' },
 ];
 
@@ -48,12 +48,18 @@ const stepDuration = (a: StageName, b: StageName) =>
   (a === 'lk' && b === 'kl') || (a === 'kl' && b === 'lk') ? 0.55 : 0.42;
 
 interface TextMorphAnimationProps {
+  ref?: Ref<TextMorphHandle>;
   onComplete?: () => void;
   startDelay?: number;
   className?: string;
 }
 
+export interface TextMorphHandle {
+  replay(): boolean;
+}
+
 export default function TextMorphAnimation({
+  ref,
   onComplete,
   startDelay = 0,
   className = '',
@@ -63,11 +69,17 @@ export default function TextMorphAnimation({
   const targetRef = useRef(0); // 目标阶段下标
   const busyRef = useRef(false); // 是否有 Flip 正在播放
   const reduceMotion = usePrefersReducedMotion();
+  const replayRef = useRef<(() => boolean) | null>(null);
+  useImperativeHandle(ref, () => ({ replay: () => replayRef.current?.() ?? false }), []);
 
   useGSAP(
     (_ctx, contextSafe) => {
       const root = containerRef.current;
       if (!root || !contextSafe) return;
+      let ready = false;
+      let replaying = false;
+      let hold: gsap.core.Tween | undefined;
+      busyRef.current = false;
 
       // 把某阶段立即摆到 DOM（display + flex order），不带动画。
       const applyStage = (idx: number) => {
@@ -126,7 +138,14 @@ export default function TextMorphAnimation({
       function stepToward() {
         if (currentRef.current === targetRef.current) {
           busyRef.current = false;
-          if (currentRef.current === FINAL_INDEX) onComplete?.();
+          if (replaying && currentRef.current === 0) {
+            hold = gsap.delayedCall(0.3, () => goTo(FINAL_INDEX));
+          }
+          if (currentRef.current === FINAL_INDEX) {
+            ready = true;
+            replaying = false;
+            onComplete?.();
+          }
           return;
         }
         busyRef.current = true;
@@ -158,18 +177,20 @@ export default function TextMorphAnimation({
         .to(root, { opacity: 1, duration: 0.4 })
         .add(() => goTo(FINAL_INDEX), '+=0.1');
 
-      // hover：进入逐级反向回 Locking，离开逐级正向到 Funk&Love。
-      const onMouseEnter = () => goTo(0);
-      const onMouseLeave = () => goTo(FINAL_INDEX);
-      root.addEventListener('mouseenter', onMouseEnter);
-      root.addEventListener('mouseleave', onMouseLeave);
+      // 首轮完成后，只有唱片的显式 replay() 才会再次播放。
+      replayRef.current = () => {
+        if (!ready || replaying || busyRef.current) return false;
+        replaying = true;
+        goTo(0);
+        return true;
+      };
 
       return () => {
-        root.removeEventListener('mouseenter', onMouseEnter);
-        root.removeEventListener('mouseleave', onMouseLeave);
+        replayRef.current = null;
+        hold?.kill();
       };
     },
-    { scope: containerRef, dependencies: [reduceMotion] }
+    { scope: containerRef, dependencies: [reduceMotion], revertOnUpdate: true }
   );
 
   // 初始 display 直接按 locking 阶段渲染，避免首帧整词闪现。
@@ -184,14 +205,13 @@ export default function TextMorphAnimation({
   return (
     <div
       ref={containerRef}
-      className={`inline-flex items-center justify-center cursor-pointer select-none ${className}`}
+      className={`inline-flex items-center justify-center select-none ${className}`}
       style={{
         // 固定高度，杜绝 Flip absolute 阶段容器塌缩导致的上下布局闪动。
         height: '1.2em',
         lineHeight: 1.2,
         opacity: 0,
-        textShadow:
-          '0 0 40px rgba(139, 92, 246, 0.8), 0 0 80px rgba(236, 72, 153, 0.6)',
+        textShadow: "var(--hero-title-shadow)",
       }}
       aria-label="Funk & Love"
     >

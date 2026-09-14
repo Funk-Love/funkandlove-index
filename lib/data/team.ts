@@ -28,7 +28,7 @@ export const FEATURES: Feature[] = [
 ];
 
 export const RECRUIT_CONTACT = {
-  name: "dragon",
-  wechat: "superhandsomezwl",
-  term: "25届",
+  name: "乙烯",
+  wechat: "LKSnFL2026",
+  term: "26届",
 } as const;

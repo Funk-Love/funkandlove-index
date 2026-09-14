@@ -1,173 +1,43 @@
-'use client';
+"use client";
 
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { Music, Heart, Users, Flame, Scale, LucideIcon } from 'lucide-react';
-import Card from './ui/Card';
-import SectionHeader from './ui/SectionHeader';
-import ImagePlaceholder from './ui/ImagePlaceholder';
-import { SITE_CONFIG } from '@/lib/constants';
-import { staggerContainer, cardItem } from '@/lib/animations';
-import { getMouseInfluence, interpolateColor } from '@/lib/gradients';
+import SectionHeader from "./ui/SectionHeader";
+import ImagePlaceholder from "./ui/ImagePlaceholder";
+import { SITE_CONFIG } from "@/lib/constants";
+import { getIcon } from "@/lib/icons";
 
-gsap.registerPlugin(useGSAP);
-
-// Icon mapping - 将字符串映射到实际的 Lucide 图标组件
-const iconMap: Record<string, LucideIcon> = {
-  Music,
-  Heart,
-  Users,
-  Flame,
-  Scale,
-};
-
-// 按鼠标与卡片中心的距离插值图标颜色（沿用原配色分层）。
-const iconColorFor = (influence: number) => {
-  if (influence > 0.7) return interpolateColor('#8b5cf6', '#ec4899', (influence - 0.7) / 0.3);
-  if (influence > 0.4) return interpolateColor('#3b82f6', '#8b5cf6', (influence - 0.4) / 0.3);
-  return interpolateColor('#10b981', '#3b82f6', influence / 0.4);
-};
-
-// 卡片背景 tint：静止(influence=0)≈ 原 bg-white/10，鼠标靠近时偏紫并略加深。
-const cardBgFor = (influence: number) => {
-  const rgb = interpolateColor('#ffffff', '#8b5cf6', influence);
-  const alpha = (0.1 + influence * 0.12).toFixed(3);
-  return rgb.replace('rgb(', 'rgba(').replace(')', `, ${alpha})`);
-};
-
+/** 利用舞台照片左侧暗部排字；窄屏延伸暗部，完整保留右侧人物。 */
 export default function TeamFeatures() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, margin: '-100px' });
-
-  // 图标颜色跟随鼠标：直接用 gsap.quickSetter 写 DOM，不再经过 React 状态，
-  // 彻底消除原来每次 mousemove 重渲染整个 section 的开销。
-  useGSAP(
-    () => {
-      const root = containerRef.current;
-      if (!root) return;
-
-      const cards = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('.feature-card'));
-      const icons = gsap.utils.toArray<HTMLElement>(root.querySelectorAll('.feature-icon'));
-      const setColor = icons.map((el) => gsap.quickSetter(el, 'color'));
-      const setBg = cards.map((el) => gsap.quickSetter(el, 'backgroundColor'));
-
-      // 初始值（influence=0）
-      setColor.forEach((set) => set(iconColorFor(0)));
-      setBg.forEach((set) => set(cardBgFor(0)));
-
-      let mx = -9999;
-      let my = -9999;
-      let rafId: number | null = null;
-
-      const paint = () => {
-        rafId = null;
-        // 先批量读取卡片中心（视口坐标，随滚动实时取，避免缓存失效），再批量写色，避免布局抖动。
-        const centers = cards.map((el) => {
-          const r = el.getBoundingClientRect();
-          return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-        });
-        centers.forEach((c, i) => {
-          const influence = getMouseInfluence(mx, my, c.x, c.y, 400);
-          setColor[i]?.(iconColorFor(influence));
-          setBg[i]?.(cardBgFor(influence));
-        });
-      };
-
-      const onMove = (e: MouseEvent) => {
-        mx = e.clientX;
-        my = e.clientY;
-        if (rafId === null) rafId = requestAnimationFrame(paint);
-      };
-
-      window.addEventListener('mousemove', onMove, { passive: true });
-      return () => {
-        window.removeEventListener('mousemove', onMove);
-        if (rafId !== null) cancelAnimationFrame(rafId);
-      };
-    },
-    { scope: containerRef }
-  );
-
   return (
-    <section
-      id="features"
-      className="relative pt-[12vh] pb-8 md:pt-[10vh] px-4 overflow-hidden min-h-screen flex items-center"
-    >
-      {/* 背景图片 - 全屏 */}
-      <div className="absolute inset-0 z-0">
-        <ImagePlaceholder
-          src={SITE_CONFIG.images.featuresBackground}
-          alt="团队特色背景"
-          fill
-          className="w-full h-full"
-          imageClassName="object-cover"
-          placeholderText="特色背景图待补充"
-          suggestedSize="1920x1080px"
-          rounded={false}
-        />
+    <div className="features-scene relative isolate w-full text-paper">
+      <div className="features-photo absolute inset-0 -z-20">
+        <ImagePlaceholder src={SITE_CONFIG.images.featuresBackground}
+          alt="Funk & Love 舞台演出" fill priority sizes="100vw"
+          className="w-full h-full" imageClassName="object-cover"
+          placeholderText="舞台演出照片" rounded={false} />
       </div>
-
-      <div className="max-w-7xl mx-auto relative z-10 w-full">
-        {/* 左侧内容区域 - 占据 1/3 宽度 */}
-        <div className="w-full lg:w-2/5">
-          {/* 标题 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            transition={{ duration: 0.6 }}
-            className="mb-[clamp(1.5rem,5vh,3rem)]"
-          >
-            <SectionHeader
-              index={3}
-              eyebrow="features"
-              title="团队特色"
-              subtitle="我们的四大核心优势"
-              theme="dark"
-            />
-          </motion.div>
-
-          {/* 特色卡片 - 垂直排列 */}
-          <motion.div
-            ref={containerRef}
-            variants={staggerContainer}
-            initial="initial"
-            animate={isInView ? 'animate' : 'initial'}
-            className="space-y-[clamp(0.75rem,2vh,1.5rem)]"
-          >
+      <div className="features-shade absolute inset-0 -z-10" aria-hidden="true" />
+      <div className="features-layout max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-12">
+        <div className="features-copy">
+          <SectionHeader index={3} eyebrow="features" title="团队特色" theme="dark" className="mb-6" />
+          <div className="divide-y divide-paper/15 border-t border-paper/15">
             {SITE_CONFIG.features.map((feature, index) => {
-              const IconComponent = iconMap[feature.icon];
-
+              const Icon = getIcon(feature.icon);
               return (
-                <motion.div key={index} variants={cardItem}>
-                  <Card className="p-6 feature-card" hoverScale={true} hoverShadow={true}>
-                    <div className="flex items-start gap-4">
-                      {/* 图标 - 颜色由 gsap.quickSetter 直接驱动 */}
-                      <div className="feature-icon shrink-0">
-                        {IconComponent && <IconComponent size={40} strokeWidth={1.5} />}
-                      </div>
-
-                      {/* 文字内容 */}
-                      <div className="flex-1">
-                        {/* 标题 */}
-                        <h3 className="font-bold text-white mb-2 text-[clamp(1rem,2.1vh,1.25rem)]">
-                          {feature.title}
-                        </h3>
-
-                        {/* 描述 */}
-                        <p className="text-neutral-200 leading-relaxed text-[clamp(0.8rem,1.6vh,1rem)]">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
+                <div key={feature.title} className="flex items-start gap-4 py-[clamp(0.9rem,2.6vh,1.4rem)]">
+                  <span className="pt-1 text-[10px] font-mono text-paper/45">{String(index + 1).padStart(2, "0")}</span>
+                  <div className="flex-1">
+                    <h3 className="flex items-center gap-2.5 font-bold text-lg leading-tight">
+                      {Icon && <Icon size={19} strokeWidth={1.5} className="text-pop-500 shrink-0" />}
+                      {feature.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-paper/75 leading-relaxed">{feature.description}</p>
+                  </div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { LucideIcon, Video, MessageCircle, Tv, Instagram, Ghost, Target, Zap, Cloud, Bot, Shirt } from "lucide-react";
+import type { IconName } from "./icons";
 import { TEAM_DESCRIPTION, TEAM_PHILOSOPHY, FEATURES } from "./data/team";
 
 /**
@@ -12,7 +12,8 @@ export const NAV_HEIGHT = 80;
  */
 export interface SocialLink {
   platform: string;
-  icon: LucideIcon;
+  /** 图标名,由 lib/icons.ts 解析 */
+  icon: IconName;
   url?: string;
   isComingSoon: boolean;
 }
@@ -33,7 +34,8 @@ export interface ActivitySubLink {
   id: string;
   label: string;
   url: string;
-  icon?: LucideIcon;
+  /** 图标名,由 lib/icons.ts 解析 */
+  icon?: IconName;
 }
 
 /**
@@ -42,9 +44,17 @@ export interface ActivitySubLink {
 export interface NavLink {
   id: string;
   label: string;
+  /** 页内锚点(如 "#team") */
   href?: string;
   url?: string;
   subLinks?: ActivitySubLink[];
+  /**
+   * "coming-soon":功能未上线,点击只弹提示,不跳转。
+   * 桌面 Navigation 与移动 MobileNav 共用同一行为。
+   */
+  kind?: "coming-soon";
+  /** kind === "coming-soon" 时的提示文案 */
+  message?: string;
 }
 
 /**
@@ -72,25 +82,25 @@ export const SITE_CONFIG = {
   socialLinks: [
     {
       platform: "抖音",
-      icon: Video,
+      icon: "Video",
       url: "https://www.douyin.com/user/MS4wLjABAAAAowd4J-nvC1oFpGl7FmBJ78xwqblR_a_wSAIiiYG5V1HEKfTwStguqsSPbARI7WuV",
       isComingSoon: false
     },
     {
       platform: "微信视频号",
-      icon: MessageCircle,
+      icon: "MessageCircle",
       url: undefined,
       isComingSoon: true
     },
     {
       platform: "B站",
-      icon: Tv,
+      icon: "Tv",
       url: undefined,
       isComingSoon: true
     },
     {
       platform: "Instagram",
-      icon: Instagram,
+      icon: "Instagram",
       url: undefined,
       isComingSoon: true
     }
@@ -146,10 +156,11 @@ export const NAV_LINKS: NavLink[] = [
     label: "首页", 
     href: "#hero" 
   },
-  { 
-    id: "plan", 
-    label: "计划", 
-    href: "#under-construction" 
+  {
+    id: "plan",
+    label: "计划",
+    kind: "coming-soon",
+    message: "Funk&Love训练计划功能还在制作中，预计在下个大版本加入",
   },
   { 
     id: "team", 
@@ -164,19 +175,19 @@ export const NAV_LINKS: NavLink[] = [
         id: "halloween",
         label: "万圣节特别活动",
         url: "https://activities.funk-and.love/activities/2025/halloween-club/index.html",
-        icon: Ghost
+        icon: "Ghost"
       },
       {
         id: "xiaoming",
         label: "小明大师课",
         url: "https://activities.funk-and.love/activities/2025/xiaoming-masterclass/index.html",
-        icon: Target
+        icon: "Target"
       },
       {
         id: "funk-you-up",
         label: "2025快闪",
         url: "https://activities.funk-and.love/activities/2025/funk-you-up/index.html",
-        icon: Zap
+        icon: "Zap"
       }
     ]
   },
@@ -193,7 +204,7 @@ export const NAV_LINKS: NavLink[] = [
         id: "jersey2026",
         label: "2026队服",
         url: "https://merch.funk-and.love/jersey2026/",
-        icon: Shirt
+        icon: "Shirt"
       }
     ]
   },
@@ -205,13 +216,13 @@ export const NAV_LINKS: NavLink[] = [
         id: "lockcloud",
         label: "LockCloud",
         url: "https://cloud.funk-and.love",
-        icon: Cloud
+        icon: "Cloud"
       },
       {
         id: "lockai",
         label: "LockAI",
         url: "https://ai.funk-and.love",
-        icon: Bot
+        icon: "Bot"
       }
     ]
   }

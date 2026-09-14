@@ -1,51 +1,62 @@
 import type { Leader } from "@/lib/types";
 
+/**
+ * 角色 → 视觉映射,全站唯一出口。只用 globals.css 的 role-* token。
+ * founder = 暖金属(荣誉),captain = 焦橙,vice = 青,other = 墨色。
+ */
+
+/** 届数 / 头衔徽章 */
 export function getRoleBadgeStyle(role: Leader["role"]): string {
   switch (role) {
     case "founder":
-      return "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30";
+      return "bg-role-founder text-ink";
     case "captain":
-      return "bg-purple-500/90 text-white";
+      return "bg-role-captain text-paper";
     case "vice":
-      return "bg-blue-500/80 text-white";
+      return "bg-role-vice text-paper";
     default:
-      return "bg-gray-500/80 text-white";
+      return "bg-role-other text-paper";
   }
 }
 
+/** 卡片相框边框(静态 + hover) */
 export function getCardBorderStyle(role: Leader["role"]): string {
   switch (role) {
     case "founder":
-      return "border-amber-500/50 group-hover:border-amber-400 group-hover:shadow-amber-500/30";
+      return "border-role-founder group-hover:shadow-[4px_4px_0_0_var(--color-role-founder)]";
     case "captain":
-      return "border-white/10 group-hover:border-purple-500/50 group-hover:shadow-purple-500/20";
+      return "border-ink group-hover:border-role-captain group-hover:shadow-[4px_4px_0_0_var(--color-role-captain)]";
     case "vice":
-      return "border-white/10 group-hover:border-blue-500/50 group-hover:shadow-blue-500/20";
+      return "border-ink group-hover:border-role-vice group-hover:shadow-[4px_4px_0_0_var(--color-role-vice)]";
     default:
-      return "border-white/10 group-hover:border-gray-500/50 group-hover:shadow-gray-500/20";
+      return "border-ink group-hover:shadow-hard";
   }
 }
 
+/** 卡片底部头衔文字色(压在深色照片渐变上) */
 export function getTitleColor(role: Leader["role"]): string {
   switch (role) {
     case "founder":
-      return "text-amber-400";
+      return "text-role-founder-ink";
     case "captain":
-      return "text-purple-300";
+      return "text-role-captain-ink";
     case "vice":
-      return "text-blue-300";
+      return "text-role-vice-ink";
     default:
-      return "text-gray-400";
+      return "text-paper-3";
   }
 }
 
+/** 详情弹窗边框 */
 export function getModalBorderStyle(role: Leader["role"]): string {
   switch (role) {
     case "founder":
-      return "border-amber-500/50";
+      return "border-role-founder";
     case "captain":
-      return "border-purple-500/30";
+      return "border-role-captain";
+    case "vice":
+      return "border-role-vice";
     default:
-      return "border-white/10";
+      return "border-ink";
   }
 }

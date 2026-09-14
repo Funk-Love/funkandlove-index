@@ -1,101 +1,141 @@
 @import "tailwindcss";
 
-@theme inline {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+/* ============================================================
+ * 设计 token(Tailwind v4 @theme 命名空间)
+ *
+ * 设计语言:70s Funk 海报 × 编辑部网格(方案 D1)。
+ * 奶油纸面承担阅读区,深棕承托 Hero,焦橙 / 芥末黄做重点,暖金属留给荣誉(创始人)。
+ * 组件只引用这里的语义名,不写原色。
+ *
+ *   paper   = 纸面 / 表面层级
+ *   ink     = 文字 / 线条
+ *   accent  = 品牌主强调:焦橙
+ *   pop     = 第二强调:芥末黄
+ *   warm    = 荣誉 / 创始人:暖金属
+ *   warm-b  = 荣誉深支:铜
+ *   cool    = 副队长角色色:青
+ *   ok      = 成功态:绿
+ *   stage   = Hero 深棕舞台
+ * ============================================================ */
+@theme {
+  /* 字体 */
+  --font-sans: var(--font-inter), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  /* 展示标题:Righteous(拉丁)+ 中文回退系统黑体 */
+  --font-display: var(--font-righteous), var(--font-inter), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  /* TextMorph 形变标题专用(D3):固定 Inter,不随 body / display 字体变化 */
+  --font-morph: var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, "Courier New", monospace;
+
+  /* 圆角 / 模糊 */
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --blur-sm: 4px;
+  --blur-md: 8px;
+
+  /* 纸面 */
+  --color-paper: #f4e9d8;
+  --color-paper-2: #ebdcc3;
+  --color-paper-3: #dfcca9;
+  --color-paper-4: #cdb58b;
+
+  /* 墨色 */
+  --color-ink: #2b1d14;
+  --color-ink-2: #4a3729;
+  --color-ink-muted: #6b5646;
+  --color-ink-faint: #9c8674;
+
+  /* Hero 舞台深棕 */
+  --color-stage: #1e1410;
+  --color-stage-2: #2b1d14;
+  --color-stage-3: #3a2a1f;
+
+  /* accent:焦橙 */
+  --color-accent-50: #fbede7;
+  --color-accent-300: #f5b197;
+  --color-accent-400: #ee8a63;
+  --color-accent-500: #e4572e;
+  --color-accent-600: #c6431f;
+  --color-accent-900: #6b2210;
+  /* accent-b:与 accent 合并(Phase 0 的 violet 支已并入) */
+  --color-accent-b-300: #f5b197;
+  --color-accent-b-500: #e4572e;
+
+  /* 可读交互色：亮焦橙用于装饰，深陶土承载小字按钮。 */
+  --color-action: #a83b22;
+  --color-action-hover: #8d2d18;
+  --color-on-action: #fff8ed;
+  --shadow-paper: 0 12px 28px -18px rgb(43 29 20 / 0.38), 0 2px 6px rgb(43 29 20 / 0.06);
+  --shadow-paper-sm: 0 3px 10px rgb(43 29 20 / 0.09);
+  --shadow-action: 0 3px 10px rgb(0 0 0 / 0.12);
+
+  /* pop:芥末黄 */
+  --color-pop-50: #fef7e0;
+  --color-pop-300: #f9dd82;
+  --color-pop-400: #f5cb44;
+  --color-pop-500: #f2b705;
+  --color-pop-900: #7a5b00;
+
+  /* warm:暖金属;warm-b:铜 */
+  --color-warm-300: #e8ce8a;
+  --color-warm-400: #d8b35a;
+  --color-warm-500: #c9962b;
+  --color-warm-900: #5e4410;
+  --color-warm-b-400: #c8763a;
+  --color-warm-b-500: #a5521f;
+
+  /* cool:青 */
+  --color-cool-300: #8fc3cc;
+  --color-cool-500: #1f7a8c;
+
+  /* ok:绿 */
+  --color-ok-400: #6db688;
+  --color-ok-500: #3c8d5a;
+
+  /* 角色标签 bg / ink 配对 */
+  --color-role-founder: var(--color-warm-500);
+  --color-role-founder-2: var(--color-warm-b-500);
+  --color-role-founder-ink: var(--color-warm-400);
+  --color-role-captain: var(--color-action);
+  --color-role-captain-ink: var(--color-accent-300);
+  --color-role-vice: var(--color-cool-500);
+  --color-role-vice-ink: var(--color-cool-300);
+  --color-role-other: var(--color-ink-muted);
+  --color-role-other-ink: var(--color-paper-4);
+
+  /* 焦点环 */
+  --color-focus: var(--color-accent-500);
+
+  /* 硬阴影(海报套印感),只给强调元素用 */
+  --shadow-hard: 4px 4px 0 0 var(--color-ink);
+  --shadow-hard-sm: 2px 2px 0 0 var(--color-ink);
+  --shadow-hard-accent: 4px 4px 0 0 var(--color-accent-500);
+  --shadow-hard-pop: 4px 4px 0 0 var(--color-pop-500);
 }
 
 :root {
-  /* Primary Colors - 主色调 */
-  --primary-purple: #8b5cf6;
-  --primary-orange: #f59e0b;
-  --primary-blue: #3b82f6;
-
-  /* Accent Colors - 强调色 */
-  --accent-pink: #ec4899;
-  --accent-green: #10b981;
-
-  /* Neutral Colors - 中性色 */
-  --neutral-900: #111827;
-  --neutral-100: #f3f4f6;
-  --neutral-white: #ffffff;
-
-  /* Spacing Scale */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-
-  /* Blur Effects */
-  --blur-sm: 4px;
-  --blur-md: 8px;
-  --blur-lg: 16px;
-
-  /* Border Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-full: 9999px;
-
-  /* Font Weights */
-  --font-light: 300;
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  --font-black: 900;
+  --hero-title-shadow: none;
+  --page-bg: var(--color-paper);
+  --page-ink: var(--color-ink);
 }
 
 html {
-  scroll-behavior: smooth;
-  /* framer-motion useScroll 默认以 documentElement 为 scroll 容器，要求非 static 定位 */
+  /* framer-motion useScroll 默认以 documentElement 为 scroll 容器,要求非 static 定位 */
   position: relative;
+  /* 滚动由 GSAP ScrollTo 接管,禁用原生平滑滚动 */
+  scroll-behavior: auto !important;
 }
 
 body {
-  background: var(--neutral-900);
-  color: var(--neutral-white);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  background: var(--page-bg);
+  color: var(--page-ink);
+  font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 优化动画性能 */
-.will-change-transform {
-  will-change: transform;
-}
-
-.will-change-opacity {
-  will-change: opacity;
-}
-
-.will-change-scroll {
-  will-change: scroll-position;
-}
-
-/* 全局动画优化 */
-@media (prefers-reduced-motion: no-preference) {
-  * {
-    scroll-behavior: smooth;
-  }
-}
-
+/* 减少动效:压掉 CSS 动画与过渡。GSAP / framer 的 JS 动画由各组件通过 usePrefersReducedMotion / MotionConfig 处理 */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -116,129 +156,289 @@ body {
   scrollbar-width: none;
 }
 
-/* 选中文本样式 */
 ::selection {
-  background: var(--primary-purple);
-  color: var(--neutral-white);
+  background: var(--color-accent-500);
+  color: var(--color-paper);
 }
 
 ::-moz-selection {
-  background: var(--primary-purple);
-  color: var(--neutral-white);
+  background: var(--color-accent-500);
+  color: var(--color-paper);
 }
 
-/* 确保图片和媒体元素响应式 */
-img,
-video {
-  max-width: 100%;
-  display: block;
-}
+/* 元素重置放进 base 层:Tailwind 的 utilities 层在其之上,bg-* 等工具类才能覆盖 button 的 background:none
+ * (此前这条未分层,曾让所有按钮的背景色工具类静默失效)。 */
+@layer base {
+  img,
+  video {
+    max-width: 100%;
+    display: block;
+  }
 
-/* 链接默认样式 */
-a {
-  text-decoration: none;
-}
 
-/* 按钮重置 */
-button {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-}
+  a {
+    text-decoration: none;
+  }
 
-/* 输入框重置 */
-input,
-textarea {
-  font-family: inherit;
-}
+  button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
 
-/* 性能优化：GPU 加速 */
-.gpu-accelerated {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-/* 优化动画性能 - 仅对 transform 和 opacity 进行动画 */
-@media (prefers-reduced-motion: no-preference) {
-  .animate-smooth {
-    transition-property: transform, opacity;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  input,
+  textarea {
+    font-family: inherit;
   }
 }
 
-/* 图片加载优化 */
-img {
-  content-visibility: auto;
+/* 键盘焦点:统一 2px 焦橙环,鼠标点击不显示 */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
 }
 
-/* 减少重绘和重排 */
-.contain-layout {
-  contain: layout;
-}
-
-.contain-paint {
-  contain: paint;
-}
-
-/* 优化滚动性能 */
-.scroll-smooth {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Snap Section - 全屏 section 样式 */
-.snap-section {
-  min-height: 100vh;
-  min-height: 100dvh;
-  /* 动态视口高度，适配移动端地址栏 */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+/* ------------------------------------------------------------
+ * 纸张颗粒:一层 SVG 噪点,挂在 section 根或页面根上,不要每张卡都叠
+ * ------------------------------------------------------------ */
+@utility paper-grain {
   position: relative;
-  overflow: hidden;
-}
-
-/* 禁用默认滚动行为，由 JS 控制 */
-html {
-  scroll-behavior: auto !important;
-}
-
-/* 隐藏滚动条但保持滚动功能 */
-.hide-scrollbar,
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.hide-scrollbar::-webkit-scrollbar,
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* 响应式全屏 section 内容居中 */
-.snap-section>* {
-  width: 100%;
-}
-
-/* 确保内容不会超出视口 */
-.snap-section {
-  max-height: 100vh;
-  max-height: 100dvh;
-}
-
-/* 针对不同屏幕尺寸的优化 */
-@media (max-height: 700px) {
-  .snap-section {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
   }
 }
 
-@media (min-height: 900px) {
-  .snap-section {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
+/* 深底上的颗粒用 screen 叠加 */
+@utility paper-grain-dark {
+  position: relative;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.09;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
   }
 }
+
+/* 编辑部网格:12 列,由 section 内部按需使用 */
+@utility grid-editorial {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* 海报色条:章节标题旁的短横条 */
+@utility rule-accent {
+  height: 0.375rem;
+  width: 3rem;
+  background: var(--color-accent-500);
+}
+
+/* 窄屏或放大文字时允许内容自然长高，由桌面调用层决定是否吸附。 */
+.mobile-bootstrap { display: none; }
+@media (max-width: 767px) {
+  .responsive-view[data-viewport="pending"] > .desktop-layout { display: none; }
+  .mobile-bootstrap { min-height: 100svh; display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: var(--color-stage); color: var(--color-paper); }
+}
+.snap-section { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: visible; }
+.snap-section > * { width: 100%; }
+#team-info, #social { padding-block: clamp(5rem, 11vh, 7rem); }
+.hero-stage { min-height: 100dvh; padding-block: 7rem 5rem; }
+.hero-inner { padding-block: 0; }
+.vinyl-visual { position: relative; width: 100%; height: 100%; }
+.vinyl-poster { position: absolute; inset: 0; display: block; }
+.vinyl-poster img, .vinyl-canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+.vinyl-canvas { position: absolute; inset: 0; visibility: hidden; }
+.vinyl-visual[data-scene="ready"] .vinyl-canvas { visibility: visible; }
+.vinyl-visual[data-scene="ready"] .vinyl-poster { visibility: hidden; }
+
+/* The sleeve unfolds into a listening surface; HTML stays crisp above the real 3D paper. */
+.hero-studio { position: relative; height: clamp(30rem, calc(100dvh - 12rem), 45rem); isolation: isolate; }
+.studio-intro { position: relative; z-index: 2; width: 52%; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+.studio-art { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+/* Match the 3D scene from first paint; reset the generic poster's left and bottom edges. */
+.vinyl-studio .vinyl-poster, .studio-hit-shell { position: absolute; inset: 50% 12px auto auto; width: min(42vw, 60vh, 36rem); height: auto; aspect-ratio: 1; transform: translateY(-50%); }
+.studio-entry { position: absolute; right: -10px; top: 48%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 16px 8px; color: var(--color-paper); transition: color .2s, opacity .2s, translate .2s; }
+.studio-entry span { writing-mode: vertical-rl; font-size: 13px; letter-spacing: .06em; }
+.studio-entry:hover { color: var(--color-pop-400); translate: 0 -3px; }
+.hero-studio[data-player-open="true"] .studio-entry { opacity: 0; }
+.studio-player { position: absolute; inset: 0; z-index: 3; opacity: 0; color: var(--color-ink); padding: 34px 46px 20px; }
+.studio-back { position: absolute; top: 21px; right: 38px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 0 8px 10px; font-size: 12px; color: var(--color-ink-muted); }
+.studio-back:hover { color: var(--color-action); }
+.deck-content { height: 100%; min-height: 0; display: grid; grid-template-columns: minmax(0, .46fr) minmax(0, .54fr); gap: clamp(28px, 4.3vw, 72px); }
+.deck-left { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.deck-record-space { flex: 1; min-height: 0; }
+.deck-track-heading { margin-top: 24px; flex-shrink: 0; }
+.deck-track-heading h2 { font-family: var(--font-display); font-size: clamp(1.6rem, 2.8vw, 2.8rem); line-height: 1.05; letter-spacing: -.025em; text-wrap: balance; }
+.deck-track-heading p { margin-top: 7px; font-size: 13px; color: var(--color-ink-muted); }
+.deck-seek { margin-top: 20px; flex-shrink: 0; }
+.deck-seek > div { display: flex; justify-content: space-between; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--color-ink-muted); }
+.deck-content input[type="range"] { display: block; width: 100%; height: 20px; accent-color: var(--color-action); cursor: pointer; }
+.deck-transport { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 6px; }
+.deck-play-buttons { display: flex; align-items: center; gap: 10px; }
+.deck-transport button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: background-color .2s, color .2s; }
+.deck-transport button:hover { background: var(--color-paper-3); }
+.deck-transport .deck-play { width: 50px; height: 50px; color: var(--color-paper); background: var(--color-ink); }
+.deck-transport .deck-play:hover { background: var(--color-action); }
+.deck-volume { display: flex; align-items: center; width: 112px; }
+.deck-volume button { flex-shrink: 0; }
+.deck-status { min-height: 18px; margin-top: 5px; font-size: 11px; color: var(--color-action); }
+.deck-right { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(80px, 1fr) auto minmax(0, 1.5fr); padding-top: 18px; }
+.deck-lyrics { position: relative; min-height: 0; overflow: hidden; margin-bottom: 14px; }
+.deck-lyric-next { min-height: 32px; font-size: 13px; line-height: 1.4; color: var(--color-ink-muted); margin-top: 10px; }
+.deck-plain-lyrics { white-space: pre-line; height: 100%; overflow-y: auto; overscroll-behavior: contain; font-size: 16px; line-height: 1.8; scrollbar-width: thin; scrollbar-color: var(--color-paper-4) transparent; }
+.deck-lyric-window { position: absolute; inset: 0; }
+.deck-lyric-scroll { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; mask-image: linear-gradient(transparent, black 15%, black 85%, transparent); }
+.deck-lyric-scroll::-webkit-scrollbar { display: none; }
+.deck-lyric-lines { padding-block: var(--lyric-padding, 80px); }
+.deck-lyric-line { display: block; width: 100%; min-height: 44px; padding: 9px 4px; text-align: left; font-size: clamp(1rem, 1.65vw, 1.3rem); line-height: 1.4; font-weight: 500; color: var(--color-ink-muted); transition: color .25s; }
+.deck-lyric-line[aria-current="true"] { color: var(--color-ink); font-weight: 750; }
+.deck-lyric-line:hover { color: var(--color-action); }
+.deck-lyric-follow { position: absolute; right: 4px; bottom: 5px; padding: 5px 10px; background: var(--color-paper); color: var(--color-action); font-size: 11px; border: 1px solid var(--color-paper-4); border-radius: 4px; }
+.deck-library-heading { display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--color-ink); font-size: 12px; }
+.deck-library-heading span:last-child { color: var(--color-ink-muted); }
+.deck-library { list-style: none; margin: 0; padding: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--color-paper-4) transparent; }
+.deck-library li + li { border-top: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent); }
+.deck-library button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 38px; padding: 3px 7px; text-align: left; transition: color .2s, background-color .2s; }
+.deck-library button:hover { background: var(--color-paper-2); }
+.deck-library button[aria-current="true"] { color: var(--color-action); background: color-mix(in srgb, var(--color-accent-500) 7%, transparent); }
+.deck-track-number { width: 20px; flex-shrink: 0; font-size: 11px; font-variant-numeric: tabular-nums; }
+.deck-track-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; }
+.deck-track-name small { display: block; color: var(--color-ink-muted); font-size: 10px; font-weight: 400; margin-top: 1px; }
+.deck-track-duration { color: var(--color-ink-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.studio-paper-fallback { position: absolute; inset: 8px 12px; background: var(--color-paper); opacity: 0; transition: opacity .4s; }
+.hero-studio[data-player-open="true"] .studio-paper-fallback { opacity: 1; }
+.vinyl-studio[data-scene="ready"] .studio-paper-fallback { visibility: hidden; }
+.hero-studio[data-player-open="true"] .vinyl-studio:not([data-scene="ready"]) .vinyl-poster { width: 35%; right: auto; left: 4%; top: 4%; transform: none; }
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-studio { height: 36rem; }
+  .hero-stage:has(.hero-studio[data-player-open="true"]) { height: 100svh; min-height: 0; padding-block: 96px 16px; }
+  .hero-stage .hero-studio[data-player-open="true"] { height: calc(100svh - 112px); }
+  .studio-intro { width: 55%; }
+  .studio-intro .font-morph { font-size: 3.3rem; }
+  .studio-player { padding: 34px 32px 20px; }
+  .deck-content { gap: 24px; }
+}
+@media (max-width: 767px) {
+  .hero-studio { height: auto; min-height: 680px; margin-top: 16px; }
+  .studio-intro { width: 100%; height: auto; padding-top: min(96vw, 360px); }
+  /* The open deck occupies one viewport; lyrics and the shelf own their overflow. */
+  #hero:has(.hero-studio[data-player-open="true"]) { height: 100svh; min-height: 0; }
+  #hero:has(.hero-studio[data-player-open="true"]) .mobile-hero-body { min-height: 0; padding: 80px 12px 12px; }
+  #hero:has(.hero-studio[data-player-open="true"]) .mobile-hero-eyebrow,
+  #hero:has(.hero-studio[data-player-open="true"]) .mobile-hero-next { display: none; }
+  .hero-studio[data-player-open="true"] { height: 100%; min-height: 0; margin-top: 0; flex: 1; }
+  .hero-studio[data-player-open="true"] .studio-intro { position: absolute; inset: 0; }
+  .vinyl-studio .vinyl-poster, .studio-hit-shell { width: min(96%, 360px); right: 0; top: 4px; transform: none; }
+  .studio-entry { right: -8px; top: 125px; }
+  .studio-player { padding: 46px 20px 20px; }
+  .studio-back { top: 17px; right: 20px; }
+  .deck-content { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px; }
+  .deck-left { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); column-gap: 12px; }
+  .deck-record-space { height: clamp(90px, 19svh, 168px); min-height: 0; }
+  .deck-track-heading { margin-top: 0; align-self: center; }
+  .deck-track-heading h2 { font-size: clamp(1.1rem, 5.1vw, 1.5rem); overflow-wrap: anywhere; }
+  .deck-track-heading p { font-size: 12px; }
+  .deck-seek { grid-column: 1 / -1; margin-top: 8px; }
+  .deck-transport { grid-column: 1 / -1; gap: 8px; }
+  .deck-play-buttons { gap: 4px; }
+  .deck-volume { width: 96px; min-width: 0; }
+  .deck-volume input { min-width: 0; }
+  .deck-status { grid-column: 1 / -1; }
+  .deck-status:empty { display: none; }
+  .deck-right { padding-top: 0; grid-template-rows: minmax(0, 1fr) auto minmax(0, 1.3fr); }
+  .deck-lyrics { min-height: 0; margin-bottom: 8px; }
+  .deck-lyric-line { font-size: 1rem; }
+  .deck-lyric-next { font-size: 12px; min-height: 0; }
+  .deck-library button { min-height: 45px; gap: 8px; }
+  .deck-track-name { font-size: 12px; }
+  .studio-paper-fallback { inset-inline: 4px; }
+  .hero-studio[data-player-open="true"] .vinyl-studio:not([data-scene="ready"]) .vinyl-poster { width: 36%; left: 4%; top: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vinyl-studio .vinyl-canvas { display: block !important; }
+  .vinyl-studio[data-scene="ready"] .vinyl-poster { visibility: hidden !important; }
+  .hero-studio *, .hero-studio *::before { transition-duration: 0s !important; }
+}
+@media (max-width: 1023px) {
+  .hero-stage { padding-top: 8rem; }
+  .hero-composition { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero-composition .hero-visual { order: 0; }
+  .hero-composition .hero-content { order: 1; }
+  .hero-composition .hero-visual > div { width: min(48vw, 22rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vinyl-canvas { display: none; }
+  .vinyl-visual[data-scene="ready"] .vinyl-poster { visibility: visible; }
+}
+
+/* 品牌颜色与文字共享 currentColor，保留原图的笔刷细节。 */
+.brand-mark {
+  background-color: currentColor;
+  mask: url('/icon.png') center / contain no-repeat;
+}
+
+/* 深棕的空间模型：掠射光、偏心壁面和低处的反光；无常驻动画。 */
+.hero-backdrop {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  perspective: 1100px;
+  background: radial-gradient(ellipse at 82% 28%, #76503635, transparent 57%),
+    linear-gradient(165deg, transparent 58%, #100c0940);
+}
+.hero-backdrop-wall {
+  position: absolute; left: 59%; top: -20%; width: 58%; height: 140%;
+  transform: rotateY(-24deg) rotateZ(21deg);
+  background: linear-gradient(90deg, #75533b40, #3a281c24 2%, #1e141000 80%);
+  border-left: 1px solid #d3ad7433;
+  box-shadow: -32px 8px 70px #0b080630;
+}
+.hero-backdrop-floor {
+  position: absolute; width: 83%; height: 28%; right: -20%; bottom: -10%;
+  border-radius: 50%; transform: rotate(-12deg);
+  background: radial-gradient(ellipse, #c5955524, #8051320a 48%, transparent 70%);
+}
+
+.features-scene { min-height: 100dvh; background: #080808; }
+.features-layout { min-height: 100dvh; display: flex; align-items: center; padding-block: clamp(6rem, 11vh, 7rem) 4rem; }
+.features-copy { width: 34%; max-width: 25rem; }
+.features-shade { background: linear-gradient(90deg, #08080885, transparent 46%); }
+.next-member-card { box-shadow: 0 3px 8px #2b1d1409, 3px 4px 0 -1px var(--color-paper), 3px 4px 0 0 #2b1d1420; }
+@media (max-width: 1023px) {
+  .hero-backdrop-wall { left: 48%; opacity: .65; }
+  .features-layout { min-height: 0; padding-block: 7rem 52vw; }
+  .features-copy { width: 100%; max-width: 32rem; }
+  .features-photo { top: auto; height: 67vw; }
+  .features-shade { background: linear-gradient(180deg, #080808 0%, #080808 47%, transparent 79%); }
+}
+@media (max-width: 767px) {
+  .features-layout { padding-block: 4.5rem 53vw; }
+  .features-photo { height: 80vw; }
+  .features-photo img { object-position: 70% bottom; }
+  .features-shade { background: linear-gradient(180deg, #080808 0%, #080808 55%, transparent 84%); }
+}
+
+@media (max-width: 1023px) {
+  .leaders-heading { align-items: start; }
+  .leaders-intro-copy { max-width: 14rem; }
+}
+.locker-announcement { animation: locker-onstage .45s cubic-bezier(.16,1,.3,1) both; }
+@keyframes locker-onstage { from { opacity: .4; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .locker-announcement { animation: none; } }
+
+.nav-dropdown-paper { box-shadow: 0 18px 45px #100b0929; border: 1px solid #2b1d1424; border-top: 2px solid var(--color-action); }

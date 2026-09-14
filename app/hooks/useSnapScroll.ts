@@ -29,6 +29,9 @@ export function useSnapScroll({
   const [currentIndex, setCurrentIndex] = useState(0);
   const isScrolling = useRef(false);
   const lastScrollTime = useRef(0);
+  const scrollDirection = useRef(0);
+  const wheelIntent = useRef({ delta: 0, time: 0 });
+  const returningFromFree = useRef(false);
   // 当前正在播放的吸附动画（ScrollToPlugin tween），用于打断与卸载清理。
   const scrollTweenRef = useRef<gsap.core.Tween | null>(null);
 
@@ -36,6 +39,7 @@ export function useSnapScroll({
 
   const releaseLock = useCallback(() => {
     isScrolling.current = false;
+    lastScrollTime.current = Date.now();
   }, []);
 
   const scrollToSection = useCallback((index: number) => {
@@ -49,13 +53,24 @@ export function useSnapScroll({
 
     isScrolling.current = true;
     setCurrentIndex(index);
+    const targetY = element.getBoundingClientRect().top + window.scrollY;
+    scrollDirection.current = Math.sign(targetY - window.scrollY);
+    wheelIntent.current.delta = 0;
+    returningFromFree.current = false;
 
     scrollTweenRef.current = gsap.to(window, {
-      duration: duration / 1000,
+      // 半途转向按剩余距离缩短动画，避免只剩几十像素仍拖满一整屏的时间。
+      duration: Math.max(0.2, duration / 1000 * Math.min(1, Math.abs(targetY - window.scrollY) / window.innerHeight)),
       // power2.inOut ≈ 原 easeInOutCubic（三次缓动）
       ease: 'power2.inOut',
-      scrollTo: { y: element.offsetTop, autoKill: false },
+      scrollTo: { y: targetY, autoKill: true, onAutoKill: releaseLock },
       onComplete: releaseLock,
+      onUpdate: () => {
+        if (document.querySelector('[data-modal-open="true"]')) {
+          scrollTweenRef.current?.kill();
+          releaseLock();
+        }
+      },
     });
   }, [sectionIds, duration, releaseLock]);
 
@@ -73,91 +88,76 @@ export function useSnapScroll({
     return 0;
   }, [sectionIds]);
 
-  // 判断当前在哪个 section 内部（精确判断，用于向上滚动）
-  const getContainingSectionIndex = useCallback(() => {
-    const scrollY = window.scrollY;
-    const viewportHeight = window.innerHeight;
-    const viewportBottom = scrollY + viewportHeight;
-
-    for (let i = 0; i < sectionIds.length; i++) {
-      const element = document.getElementById(sectionIds[i]);
-      if (!element) continue;
-
-      const sectionTop = element.offsetTop;
-      const sectionBottom = sectionTop + element.scrollHeight;
-
-      if (scrollY >= sectionTop - NAV_HEIGHT - 100 && viewportBottom <= sectionBottom + 100) {
-        return i;
-      }
+  // 导航高亮允许提前切换，但滚动目标必须按真实位置选，不能把人反向拉回。
+  // null 表示横滚及后续自由区，-1 表示页首，没有上一个目标。
+  const getSnapTarget = useCallback((direction: number): number | null => {
+    const y = window.scrollY;
+    const tops = sectionIds.slice(0, snapLast + 1).map((id) => {
+      const el = document.getElementById(id);
+      return el ? el.getBoundingClientRect().top + y : Infinity;
+    });
+    if (y > tops[snapLast] + 5) return null;
+    if (direction > 0) {
+      const next = tops.findIndex((top) => top > y + 5);
+      return next < 0 ? null : next;
     }
-    return getCurrentSectionIndex();
-  }, [sectionIds, getCurrentSectionIndex]);
+    for (let i = tops.length - 1; i >= 0; i--) {
+      if (tops[i] < y - 5) return i;
+    }
+    return -1;
+  }, [sectionIds, snapLast]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
-    if (!enabled) return;
+    if (!enabled || e.ctrlKey) return;
 
     // 弹窗打开时不处理
     if (document.querySelector('[data-modal-open="true"]')) return;
 
-    if (isScrolling.current) {
-      e.preventDefault();
+    const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1);
+    if (!delta || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    const direction = Math.sign(delta);
+    const targetIndex = getSnapTarget(direction);
+    const reversing = isScrolling.current && direction !== scrollDirection.current;
+
+    if (!isScrolling.current && targetIndex === null) {
+      wheelIntent.current.delta = 0;
+      returningFromFree.current = direction < 0;
       return;
     }
-
-    const delta = e.deltaY;
-    const isScrollingUp = delta < 0;
-    const actualIndex = isScrollingUp
-      ? getContainingSectionIndex()
-      : getCurrentSectionIndex();
-
-    // 已离开 snap 区域：完全自由滚动，不拦截 wheel
-    if (actualIndex > snapLast) return;
-
-    const targetIndex = isScrollingUp ? actualIndex - 1 : actualIndex + 1;
-
-    // 在 snap 区域顶部往上：阻止越界
-    if (targetIndex < 0) {
-      e.preventDefault();
+    // 自由区里反向打断导航跳转后，当前这次滚动直接交还浏览器。
+    if (reversing && targetIndex === null) {
+      scrollTweenRef.current?.kill();
+      releaseLock();
+      returningFromFree.current = direction < 0;
       return;
     }
-
-    // 跨越 snap 区域下边界（如 features → leaders）：让原生滚动接管，不 snap
-    if (targetIndex > snapLast) return;
-
-    // 向上 snap 守门：当前 section 必须已滚到顶（scrollY ≈ offsetTop）才允许 snap。
-    // 这样从下方 free 区原生滚回 features 时，需要先把 features 完整滚到顶才会 snap 到 team，
-    // 不会出现 features 没看完就被中途 snap 走。
-    if (isScrollingUp) {
-      const currentEl = document.getElementById(sectionIds[actualIndex]);
-      if (!currentEl) return;
-      if (window.scrollY > currentEl.offsetTop + 5) return;
-    }
-
-    // 仍在 snap 区域内：阻止原生滚动避免漂移，再判断是否触发 snap
     e.preventDefault();
+    if (isScrolling.current && !reversing) return;
+    if (targetIndex === null || targetIndex < 0) return;
 
     const now = Date.now();
-    if (now - lastScrollTime.current < 100) return;
-    if (Math.abs(delta) < threshold) return;
-    if (targetIndex === actualIndex) return;
-
-    lastScrollTime.current = now;
+    const intent = wheelIntent.current;
+    if (now - intent.time > 160 || Math.sign(intent.delta) !== direction) intent.delta = 0;
+    intent.delta += delta;
+    intent.time = now;
+    // 触控板的小增量累计判断，不能每个都吃掉；转向达到阈值就直接回程。
+    if (Math.abs(intent.delta) < threshold) return;
+    // 收尾只过滤同向惯性；刚落到下一屏就反向，也应立即响应。
+    if (!reversing && direction === scrollDirection.current && now - lastScrollTime.current < 100) return;
     scrollToSection(targetIndex);
-  }, [enabled, threshold, snapLast, sectionIds, getContainingSectionIndex, getCurrentSectionIndex, scrollToSection]);
+  }, [enabled, threshold, getSnapTarget, scrollToSection, releaseLock]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.defaultPrevented || document.querySelector('[data-modal-open="true"]') ||
+        (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"], [role="menu"]'))) return;
     if (!enabled || isScrolling.current) return;
-    const actualIndex = getCurrentSectionIndex();
-
-    // 在自由滚动区时，不接管 PageUp/Down/箭头，由浏览器原生处理
-    if (actualIndex > snapLast) return;
-
-    if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+    const downwards = e.key === 'ArrowDown' || e.key === 'PageDown';
+    const upwards = e.key === 'ArrowUp' || e.key === 'PageUp';
+    const target = getSnapTarget(upwards ? -1 : 1);
+    if (target === null) return;
+    if (downwards || upwards) {
       e.preventDefault();
-      scrollToSection(Math.min(actualIndex + 1, sectionIds.length - 1));
-    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-      e.preventDefault();
-      scrollToSection(Math.max(actualIndex - 1, 0));
+      if (target >= 0) scrollToSection(target);
     } else if (e.key === 'Home') {
       e.preventDefault();
       scrollToSection(0);
@@ -165,7 +165,7 @@ export function useSnapScroll({
       e.preventDefault();
       scrollToSection(sectionIds.length - 1);
     }
-  }, [enabled, sectionIds.length, snapLast, getCurrentSectionIndex, scrollToSection]);
+  }, [enabled, sectionIds, getSnapTarget, scrollToSection]);
 
   // 标签页切回前台时主动释放锁（rAF/ticker 在后台暂停，吸附动画可能卡住）
   useEffect(() => {
@@ -180,7 +180,8 @@ export function useSnapScroll({
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [enabled, releaseLock]);
 
-  // 被动追踪 currentIndex（自由滚动区也能让左侧锚点高亮跟随）
+  // 追踪实际位置，并在自由滚动真正返回吸附区的这一帧完成交接。
+  // 不用 wheel.deltaY 预测落点：浏览器缩放、滚轮单位与惯性都可能改变实际距离。
   useEffect(() => {
     if (!enabled) return;
     let rafId: number | null = null;
@@ -189,6 +190,17 @@ export function useSnapScroll({
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
         rafId = null;
+        if (isScrolling.current) return;
+        if (returningFromFree.current && !document.querySelector('[data-modal-open="true"]')) {
+          const target = getSnapTarget(-1);
+          if (target !== null) {
+            returningFromFree.current = false;
+            if (target >= 0) {
+              scrollToSection(target);
+              return;
+            }
+          }
+        }
         setCurrentIndex(getCurrentSectionIndex());
       });
     };
@@ -198,7 +210,7 @@ export function useSnapScroll({
       window.removeEventListener('scroll', onScroll);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, [enabled, getCurrentSectionIndex]);
+  }, [enabled, getCurrentSectionIndex, getSnapTarget, scrollToSection]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -209,6 +221,15 @@ export function useSnapScroll({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [enabled, handleWheel, handleKeyDown]);
+
+  // 运行中被禁用(如用户切换 prefers-reduced-motion):立刻打断在播的吸附并释放锁,
+  // 否则重新启用后 isScrolling 会一直为 true,wheel 被永久拦截。
+  useEffect(() => {
+    if (enabled) return;
+    returningFromFree.current = false;
+    scrollTweenRef.current?.kill();
+    releaseLock();
+  }, [enabled, releaseLock]);
 
   // 卸载时杀掉在播的吸附动画
   useEffect(() => {

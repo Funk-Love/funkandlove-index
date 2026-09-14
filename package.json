@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run leader-previews && npm run member-previews",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "lqip": "node scripts/gen-lqip.mjs",
+    "leader-previews": "node scripts/gen-leader-previews.mjs",
+    "member-previews": "node scripts/gen-member-previews.mjs",
     "deploy": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1"
   },
   "dependencies": {
@@ -19,13 +22,15 @@
     "next": "^16.1.6",
     "plyr": "^3.8.4",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.186.0",
     "baseline-browser-mapping": "^2.10.28",
     "eslint": "^9",
     "eslint-config-next": "^16.1.6",

@@ -14,6 +14,16 @@ const inter = localFont({
   variable: "--font-inter",
 });
 
+/**
+ * Righteous:70s 风格展示标题字体(拉丁子集,中文回退系统黑体,见 globals.css --font-display)。
+ */
+const righteous = localFont({
+  src: "./fonts/Righteous-latin.woff2",
+  weight: "400",
+  display: "swap",
+  variable: "--font-righteous",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://funk-and.love"
@@ -40,25 +50,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className={inter.variable}>
+    <html lang="zh-CN" className={`${inter.variable} ${righteous.variable}`}>
       <head>
-        {/* 预加载关键图片 */}
-        <link
-          rel="preload"
-          as="image"
-          href="/images/team-bg-lqip.webp"
-          fetchPriority="high"
-        />
-        <link
-          rel="preload"
-          as="image"
-          href="/images/team-bg.jpg?x-oss-process=image/resize,w_3840,limit_1/format,webp/quality,Q_100"
-        />
-        <link
-          rel="preload"
-          as="image"
-          href="/icon.png?x-oss-process=image/resize,w_3840,limit_1/format,webp/quality,Q_100"
-        />
+        {/* Hero's responsive poster owns first-screen image priority. Team photography loads in its section. */}
       </head>
       <body className="antialiased">
         {children}

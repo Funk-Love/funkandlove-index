@@ -2,66 +2,78 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { NAV_LINKS } from "@/lib/constants";
-import { oss } from "@/lib/cdn";
+import { ChevronDown, ArrowUpRight } from "lucide-react";
+import { NAV_LINKS, NAV_HEIGHT } from "@/lib/constants";
+import { getIcon } from "@/lib/icons";
 import RecruitDialog from "./shared/RecruitDialog";
+import NavPlayer from "./music/NavPlayer";
 
 // Toast 组件
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   useEffect(() => {
-    const timer = setTimeout(onClose, 2000); // 2秒后自动关闭
+    const timer = setTimeout(onClose, 2200);
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 只在挂载时启动定时器，不依赖 onClose
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-black/90 backdrop-blur-md text-white rounded-xl shadow-2xl border border-white/10"
+      initial={{ opacity: 0, y: -16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      role="status"
+      aria-live="polite"
+      className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-ink text-paper rounded-full border-2 border-pop-500 shadow-action"
     >
-      <p className="text-sm font-medium">{message}</p>
+      <p className="text-sm font-bold">{message}</p>
     </motion.div>
   );
 }
 
+const linkBase =
+  "relative group text-[15px] font-bold tracking-wide transition-colors duration-200 py-1";
+const underline =
+  "absolute -bottom-0.5 left-0 h-0.5 w-0 bg-accent-500 transition-[width] duration-200 group-hover:w-full";
+
+interface Props {
+  onJoinClick?: () => void;
+  onNavigate?: (href: string) => void;
+}
+
 /**
- * Navigation Component
- * 
- * 固定顶部导航栏，支持：
- * - 滚动时添加毛玻璃背景效果
- * - 桌面端：水平导航链接
- * - 移动端：汉堡菜单 + 全屏侧边栏
- * - 平滑滚动到对应区域
- * - 响应式设计，移动端触摸区域 ≥ 44x44px
+ * 桌面固定顶部导航(仅桌面,由 DesktopView 在 ≥768px 挂载;移动端走 MobileNav)。
+ * - 未滚动:透明,压在深棕 Hero 上,纸色文字
+ * - 滚动后:纸面底 + 2px 墨线,墨色文字
+ * - 下拉菜单:奶油纸面、细分隔、轻阴影，与触发器连续的命中区
+ * - "coming-soon" 类型链接点击只弹 Toast
  */
-export default function Navigation() {
+export default function Navigation({ onJoinClick, onNavigate }: Props) {
+  const navRef = useRef<HTMLElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const isScrolledRef = useRef(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [recruitOpen, setRecruitOpen] = useState(false);
 
-  // 显示 toast 提示
-  const showToast = (message: string) => {
-    setToastMessage(message);
-  };
+  const openRecruit = () => { setActiveDropdown(null); (onJoinClick ?? (() => setRecruitOpen(true)))(); };
 
-  // 监听滚动，添加毛玻璃背景效果
+  useEffect(() => {
+    if (!activeDropdown) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !navRef.current?.contains(event.target)) setActiveDropdown(null);
+    };
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, [activeDropdown]);
+
   useEffect(() => {
     let rafId: number | null = null;
-
     const updateScrolled = () => {
-      const nextIsScrolled = window.scrollY > 20;
-      if (isScrolledRef.current === nextIsScrolled) return;
-
-      isScrolledRef.current = nextIsScrolled;
-      setIsScrolled(nextIsScrolled);
+      const next = window.scrollY > 20;
+      if (isScrolledRef.current === next) return;
+      isScrolledRef.current = next;
+      setIsScrolled(next);
     };
-
     const handleScroll = () => {
       if (rafId !== null) return;
       rafId = requestAnimationFrame(() => {
@@ -69,7 +81,6 @@ export default function Navigation() {
         updateScrolled();
       });
     };
-
     updateScrolled();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
@@ -78,474 +89,177 @@ export default function Navigation() {
     };
   }, []);
 
-  // 平滑滚动到指定区域
   const scrollToSection = (href: string) => {
-    const id = href.replace("#", "");
-    const element = document.getElementById(id);
-    
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "start" 
-      });
-    }
-    
-    // 关闭移动端菜单
-    setIsMobileMenuOpen(false);
+    setActiveDropdown(null);
+    if (onNavigate) { onNavigate(href); return; }
+    const element = document.getElementById(href.replace("#", ""));
+    element?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
   };
+
+  const ink = isScrolled ? "text-ink hover:text-accent-600" : "text-paper/90 hover:text-paper";
 
   return (
     <>
-      {/* Toast 提示 */}
       <AnimatePresence>
-        {toastMessage && (
-          <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
-        )}
+        {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       </AnimatePresence>
 
-      {/* 固定导航栏 */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-white/80 backdrop-blur-md shadow-md"
-            : "bg-transparent"
+      <nav
+        ref={navRef}
+        className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 border-b ${
+          isScrolled ? "bg-paper/95 backdrop-blur-md border-ink/20" : "bg-transparent border-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo / 品牌名称 */}
-            <motion.button
-              onClick={() => scrollToSection("#hero")}
-              className="flex items-center gap-3 group"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {/* Logo 图标 - 根据滚动和 hover 状态切换 */}
-              <div className="relative w-8 h-8 md:w-10 md:h-10">
-                {/* 未滚动 - 默认白色 */}
-                <img
-                  src={oss("/icon.png")}
-                  alt="Funk & Love Logo"
-                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
-                    isScrolled ? "opacity-0" : "opacity-100 group-hover:opacity-0"
-                  }`}
-                />
-                {/* 未滚动 - hover 浅紫色 */}
-                <img
-                  src={oss("/icon-lightpurple.png")}
-                  alt="Funk & Love Logo"
-                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
-                    isScrolled ? "opacity-0" : "opacity-0 group-hover:opacity-100"
-                  }`}
-                />
-                {/* 滚动后 - 默认黑色 */}
-                <img
-                  src={oss("/icon-black.png")}
-                  alt="Funk & Love Logo"
-                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
-                    isScrolled ? "opacity-100 group-hover:opacity-0" : "opacity-0"
-                  }`}
-                />
-                {/* 滚动后 - hover 深紫色 */}
-                <img
-                  src={oss("/icon-darkpurple.png")}
-                  alt="Funk & Love Logo"
-                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
-                    isScrolled ? "opacity-0 group-hover:opacity-100" : "opacity-0"
-                  }`}
-                />
-              </div>
-              
-              {/* 文字 */}
-              <span className={`text-xl md:text-2xl font-bold transition-colors ${
-                isScrolled
-                  ? "text-gray-900 group-hover:text-purple-600"
-                  : "text-white group-hover:text-purple-300"
-              }`}>
-                Funk & Love
-              </span>
-            </motion.button>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between" style={{ height: NAV_HEIGHT }}>
+            {/* 品牌 */}
+            <NavPlayer onHome={() => scrollToSection("#hero")}
+              brandClassName={isScrolled ? "text-ink hover:text-accent-600" : "text-paper hover:text-pop-500"} />
 
-            {/* 桌面端导航链接 */}
-            <div className="hidden md:flex items-center space-x-6">
-              {/* 第一组：首页、队伍、历史 */}
-              {NAV_LINKS.filter(link => ['home', 'team', 'history'].includes(link.id)).map((link) => (
-                <div key={link.id} className="relative">
-                  <motion.button
-                    onClick={() => link.href && scrollToSection(link.href)}
-                    className={`text-base font-medium transition-colors relative group ${
-                      isScrolled
-                        ? "text-gray-700 hover:text-purple-600"
-                        : "text-white/90 hover:text-white"
-                    }`}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ y: 0 }}
+            {/* 链接 */}
+            <div className="desktop-nav-links flex items-center gap-6">
+              {NAV_LINKS.filter((l) => ["home", "team", "history"].includes(l.id)).map((link) => (
+                <button
+                  key={link.id}
+                  type="button"
+                  onClick={() => link.href && scrollToSection(link.href)}
+                  className={`${linkBase} ${ink}`}
+                >
+                  {link.label}
+                  <span className={underline} />
+                </button>
+              ))}
+
+              <span
+                aria-hidden
+                className={`w-0.5 h-4 rounded-full ${isScrolled ? "bg-ink/30" : "bg-paper/30"}`}
+              />
+
+              {NAV_LINKS.filter((l) => ["plan", "activities", "merch", "products"].includes(l.id)).map(
+                (link) => (
+                  <div
+                    key={link.id}
+                    className="relative"
+                    onMouseEnter={() => link.subLinks && setActiveDropdown(link.id)}
+                    onMouseLeave={(event) => {
+                      if (!event.currentTarget.querySelector('[role="menu"]')?.contains(document.activeElement)) setActiveDropdown(null);
+                    }}
+                    onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActiveDropdown(null); }}
+                    onKeyDown={(event) => {
+                      const trigger = event.currentTarget.querySelector<HTMLButtonElement>('button');
+                      if (event.key === "Escape") { event.preventDefault(); setActiveDropdown(null); trigger?.focus(); return; }
+                      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) || !link.subLinks) return;
+                      event.preventDefault();
+                      setActiveDropdown(link.id);
+                      const host = event.currentTarget;
+                      requestAnimationFrame(() => {
+                        const items = Array.from(host.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
+                        const current = items.indexOf(document.activeElement as HTMLAnchorElement);
+                        const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key === "ArrowUp" ? (current <= 0 ? items.length - 1 : current - 1) : (current + 1) % items.length;
+                        items[next]?.focus();
+                      });
+                    }}
                   >
-                    {link.label}
-                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
-                      isScrolled ? "bg-purple-600" : "bg-white"
-                    }`} />
-                  </motion.button>
-                </div>
-              ))}
-
-              {/* 分隔线 */}
-              <div className={`w-[1.5px] h-4 rounded-full ${isScrolled ? "bg-gradient-to-b from-purple-400/60 to-pink-400/60" : "bg-gradient-to-b from-white/50 to-white/20"}`} />
-
-              {/* 第二组：计划、活动、云存储 */}
-              {NAV_LINKS.filter(link => ['plan', 'activities', 'merch', 'products'].includes(link.id)).map((link) => (
-                <div 
-                  key={link.id} 
-                  className="relative"
-                  onMouseEnter={() => link.subLinks && setActiveDropdown(link.id)}
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
-                  {link.subLinks ? (
-                    // 带下拉菜单的按钮
-                    <motion.button
-                      className={`text-base font-medium transition-colors relative group flex items-center gap-1 ${
-                        isScrolled
-                          ? "text-gray-700 hover:text-purple-600"
-                          : "text-white/90 hover:text-white"
-                      }`}
-                      whileHover={{ y: -2 }}
-                    >
-                      {link.label}
-                      <ChevronDown className="w-4 h-4" />
-                      {/* 悬停下划线效果 */}
-                      <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
-                        isScrolled ? "bg-purple-600" : "bg-white"
-                      }`} />
-                    </motion.button>
-                  ) : link.url ? (
-                    // 外部链接
-                    <motion.a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-block text-base font-medium transition-colors relative group ${
-                        isScrolled
-                          ? "text-gray-700 hover:text-purple-600"
-                          : "text-white/90 hover:text-white"
-                      }`}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      {link.label}
-                      {/* 悬停下划线效果 */}
-                      <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
-                        isScrolled ? "bg-purple-600" : "bg-white"
-                      }`} />
-                    </motion.a>
-                  ) : (
-                    // 普通链接按钮
-                    <motion.button
-                      onClick={() => {
-                        if (link.id === 'plan') {
-                          showToast('Funk&Love训练计划功能还在制作中，预计在下个大版本加入');
-                        } else if (link.href) {
-                          scrollToSection(link.href);
-                        }
-                      }}
-                      className={`text-base font-medium transition-colors relative group ${
-                        isScrolled
-                          ? "text-gray-700 hover:text-purple-600"
-                          : "text-white/90 hover:text-white"
-                      }`}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ y: 0 }}
-                    >
-                      {link.label}
-                      {/* 悬停下划线效果 */}
-                      <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
-                        isScrolled ? "bg-purple-600" : "bg-white"
-                      }`} />
-                    </motion.button>
-                  )}
-
-                  {/* 下拉菜单 */}
-                  <AnimatePresence>
-                    {link.subLinks && activeDropdown === link.id && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ 
-                          duration: 0.2,
-                          ease: [0.4, 0, 0.2, 1]
-                        }}
-                        className={`absolute top-full left-0 mt-3 w-64 rounded-xl shadow-2xl overflow-hidden z-50 ${
-                          isScrolled 
-                            ? "bg-white/98 backdrop-blur-lg border border-gray-100" 
-                            : "bg-gray-900/98 backdrop-blur-lg border border-gray-700/50"
-                        }`}
-                      >
-                        {/* 装饰性渐变顶部 */}
-                        <div className={`h-1 ${
-                          isScrolled 
-                            ? "bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" 
-                            : "bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400"
-                        }`} />
-                        
-                        <div className="py-2">
-                          {link.subLinks.map((subLink, index) => (
-                            <motion.a
-                              key={subLink.id}
-                              href={subLink.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.05 }}
-                              className={`group flex items-center px-5 py-3.5 font-medium transition-all duration-200 ${
-                                isScrolled
-                                  ? "text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-600"
-                                  : "text-gray-100 hover:bg-gradient-to-r hover:from-purple-900/50 hover:to-pink-900/50 hover:text-white"
-                              }`}
-                              whileHover={{ x: 6 }}
-                            >
-                              {/* 装饰性图标 */}
-                              {subLink.icon && (
-                                <subLink.icon className={`mr-3 w-5 h-5 transition-transform group-hover:scale-110 ${
-                                  isScrolled ? "text-purple-500" : "text-purple-400"
-                                }`} />
-                              )}
-                              
-                              <span className="flex-1">{subLink.label}</span>
-                              
-                              {/* 箭头指示器 */}
-                              <svg 
-                                className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
-                                  isScrolled ? "text-purple-400" : "text-purple-300"
-                                }`}
-                                fill="none" 
-                                viewBox="0 0 24 24" 
-                                stroke="currentColor"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </motion.a>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-
-              {/* 加入我们 - 与其他 nav 按钮同款样式 */}
-              <motion.button
-                onClick={() => setRecruitOpen(true)}
-                className={`text-base font-medium transition-colors relative group ${
-                  isScrolled
-                    ? "text-gray-700 hover:text-purple-600"
-                    : "text-white/90 hover:text-white"
-                }`}
-                whileHover={{ y: -2 }}
-                whileTap={{ y: 0 }}
-              >
-                加入我们
-                <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
-                  isScrolled ? "bg-purple-600" : "bg-white"
-                }`} />
-              </motion.button>
-            </div>
-
-            {/* 移动端汉堡菜单按钮 */}
-            <motion.button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`md:hidden p-2 transition-colors ${
-                isScrolled
-                  ? "text-gray-700 hover:text-purple-600"
-                  : "text-white hover:text-purple-300"
-              }`}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </motion.button>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* 移动端全屏侧边栏 */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            {/* 背景遮罩 */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-
-            {/* 侧边栏菜单 */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ 
-                type: "spring", 
-                damping: 25, 
-                stiffness: 200 
-              }}
-              className="fixed top-0 right-0 bottom-0 w-4/5 max-w-sm bg-white z-50 md:hidden shadow-2xl"
-            >
-              {/* 侧边栏头部 */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900">菜单</h2>
-                <motion.button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-gray-700 hover:text-purple-600 transition-colors"
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Close menu"
-                >
-                  <X className="w-6 h-6" />
-                </motion.button>
-              </div>
-
-              {/* 侧边栏导航链接 */}
-              <nav className="p-6">
-                <ul className="space-y-2">
-                  {/* 第一组：首页、队伍、历史 */}
-                  {NAV_LINKS.filter(link => ['home', 'team', 'history'].includes(link.id)).map((link, index) => (
-                    <motion.li
-                      key={link.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ 
-                        delay: index * 0.1,
-                        duration: 0.3 
-                      }}
-                    >
-                      <motion.button
-                        onClick={() => link.href && scrollToSection(link.href)}
-                        className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                        whileHover={{ x: 8 }}
-                        whileTap={{ scale: 0.98 }}
-                        style={{ minHeight: "44px", minWidth: "44px" }}
+                    {link.subLinks ? (
+                      <button
+                        type="button"
+                        className={`${linkBase} ${ink} flex items-center gap-1`}
+                        aria-haspopup="menu"
+                        aria-expanded={activeDropdown === link.id}
+                        aria-controls={`nav-menu-${link.id}`}
+                        onClick={() => setActiveDropdown(link.id)}
                       >
                         {link.label}
-                      </motion.button>
-                    </motion.li>
-                  ))}
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform duration-200 ${
+                            activeDropdown === link.id ? "rotate-180" : ""
+                          }`}
+                        />
+                        <span className={underline} />
+                      </button>
+                    ) : link.url ? (
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`${linkBase} ${ink} inline-block`}
+                      >
+                        {link.label}
+                        <span className={underline} />
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (link.kind === "coming-soon") {
+                            setToastMessage(link.message ?? "功能筹备中，敬请期待");
+                            return;
+                          }
+                          if (link.href) scrollToSection(link.href);
+                        }}
+                        className={`${linkBase} ${ink}`}
+                      >
+                        {link.label}
+                        <span className={underline} />
+                      </button>
+                    )}
 
-                  {/* 分隔线 */}
-                  <li className="py-2">
-                    <div className="h-px bg-gray-200 mx-4" />
-                  </li>
+                    <AnimatePresence>
+                      {link.subLinks && activeDropdown === link.id && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.16, ease: "easeOut" }}
+                          className="nav-dropdown absolute top-full right-0 pt-5 w-80 z-50"
+                        >
 
-                  {/* 第二组：计划、活动、云存储 */}
-                  {NAV_LINKS.filter(link => ['plan', 'activities', 'merch', 'products'].includes(link.id)).map((link, index) => (
-                    <motion.li
-                      key={link.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ 
-                        delay: index * 0.1,
-                        duration: 0.3 
-                      }}
-                    >
-                      {link.subLinks ? (
-                        // 带子菜单的项
-                        <div>
-                          <motion.button
-                            onClick={() => setActiveDropdown(activeDropdown === link.id ? null : link.id)}
-                            className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center justify-between"
-                            whileHover={{ x: 8 }}
-                            whileTap={{ scale: 0.98 }}
-                            style={{ minHeight: "44px", minWidth: "44px" }}
-                          >
-                            {link.label}
-                            <ChevronDown 
-                              className={`w-5 h-5 transition-transform ${
-                                activeDropdown === link.id ? "rotate-180" : ""
-                              }`} 
-                            />
-                          </motion.button>
-                          <AnimatePresence>
-                            {activeDropdown === link.id && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="pl-4 pt-2 space-y-1">
-                                  {link.subLinks.map((subLink) => (
-                                    <motion.a
-                                      key={subLink.id}
-                                      href={subLink.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex items-center gap-3 px-4 py-2 text-base text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                                      whileHover={{ x: 4 }}
-                                      style={{ minHeight: "44px" }}
-                                    >
-                                      {subLink.icon && <subLink.icon className="w-4 h-4 text-purple-500" />}
-                                      {subLink.label}
-                                    </motion.a>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ) : link.url ? (
-                        // 外部链接项
-                        <motion.a
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                          whileHover={{ x: 8 }}
-                          whileTap={{ scale: 0.98 }}
-                          style={{ minHeight: "44px", minWidth: "44px" }}
-                        >
-                          {link.label}
-                        </motion.a>
-                      ) : (
-                        // 普通链接项
-                        <motion.button
-                          onClick={() => {
-                            if (link.id === 'plan') {
-                              showToast('Funk&Love训练计划功能还在制作中，预计在下个大版本加入');
-                              setIsMobileMenuOpen(false);
-                            } else if (link.href) {
-                              scrollToSection(link.href);
-                            }
-                          }}
-                          className="w-full text-left px-4 py-3 text-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                          whileHover={{ x: 8 }}
-                          whileTap={{ scale: 0.98 }}
-                          style={{ minHeight: "44px", minWidth: "44px" }}
-                        >
-                          {link.label}
-                        </motion.button>
+                          <div id={`nav-menu-${link.id}`} role="menu" aria-label={link.label} className="nav-dropdown-paper bg-paper text-ink rounded-sm px-3 py-2 divide-y divide-ink/10">
+                            {link.subLinks.map((subLink) => {
+                              const Icon = getIcon(subLink.icon);
+                              return (
+                                <a
+                                  key={subLink.id}
+                                  href={subLink.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  role="menuitem"
+                                  className="group/item flex min-h-16 items-center gap-4 px-3 py-4 text-[15px] font-medium text-ink hover:bg-paper-2 focus-visible:bg-paper-2 transition-colors duration-150"
+                                >
+                                  {Icon && (
+                                    <Icon className="w-5 h-5 text-ink-muted group-hover/item:text-action" strokeWidth={1.5} />
+                                  )}
+                                  <span className="flex-1">{subLink.label}</span>
+                                  <ArrowUpRight className="w-3.5 h-3.5 text-ink-muted transition-[translate,color] duration-150 group-hover/item:text-action group-hover/item:translate-x-0.5 group-hover/item:-translate-y-0.5" />
+                                </a>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
                       )}
-                    </motion.li>
-                  ))}
-                </ul>
-              </nav>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+                    </AnimatePresence>
+                  </div>
+                )
+              )}
 
-      <RecruitDialog open={recruitOpen} onClose={() => setRecruitOpen(false)} />
+              {/* 加入我们 CTA */}
+              <button
+                type="button"
+                onClick={openRecruit}
+                className={`ml-1 inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold border-2 transition-[transform,translate,box-shadow,background-color,color,border-color] duration-200 hover:-translate-y-0.5 active:translate-y-0 ${
+                  isScrolled
+                    ? "bg-action border-action text-on-action shadow-paper-sm hover:bg-action-hover"
+                    : "bg-pop-500 border-pop-500 text-ink hover:bg-pop-400"
+                }`}
+              >
+                加入我们
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {!onJoinClick && <RecruitDialog open={recruitOpen} onClose={() => setRecruitOpen(false)} />}
     </>
   );
 }
