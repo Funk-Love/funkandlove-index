@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hofmann8/funkandlove-index.git"
+    "url": "https://github.com/Funk-Love/funkandlove-index.git"
   },
   "scripts": {
     "dev": "next dev",
