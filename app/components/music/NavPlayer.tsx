@@ -78,12 +78,12 @@ export default function NavPlayer({ mobile = false, onHome, brandClassName = "",
   </div>;
 
   if (mobile) return player;
-  return <div className="nav-brand-group" data-player-active={active}>
-    <button type="button" onClick={onHome} className={`nav-brand-icon ${brandClassName}`} aria-label="回到顶部">
+  return <div className={`nav-brand-group ${brandClassName}`} data-player-active={active}>
+    <button type="button" onClick={onHome} className="nav-brand-icon" aria-label="回到顶部">
       <span ref={recordRef} className="nav-brand-record"><BrandMark className="w-9 h-9" /></span>
     </button>
     <div className="nav-brand-content">
-      <button type="button" onClick={onHome} className={`nav-brand-name font-display text-xl tracking-wide ${brandClassName}`}>
+      <button type="button" onClick={onHome} className="nav-brand-name font-display text-xl tracking-wide">
         Funk <span className="font-sans font-semibold">&amp;</span> Love
       </button>
       {player}

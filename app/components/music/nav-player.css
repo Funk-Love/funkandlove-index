@@ -1,11 +1,13 @@
 .nav-brand-group { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .nav-brand-icon { flex-shrink: 0; padding: 0; transition: color .18s; }
+.nav-brand-group[data-player-active="false"]:is(:hover, :focus-within) :is(.nav-brand-icon, .nav-brand-name),
+.nav-brand-group[data-player-active="true"] .nav-brand-icon:is(:hover, :focus-visible) { color: var(--brand-hover); }
 .nav-brand-record { display: block; transform-origin: center; }
 /* Both views keep their place: swapping them never moves the navigation links. */
 .nav-brand-content { display: grid; align-items: center; width: 280px; height: 66px; }
 .nav-brand-content > * { grid-area: 1 / 1; }
 .nav-brand-name { justify-self: start; white-space: nowrap; opacity: 1; transform: translateY(0); visibility: visible;
-  transition: opacity .18s ease-out, transform .26s cubic-bezier(.16, 1, .3, 1), visibility 0s; }
+  transition: color .18s, opacity .18s ease-out, transform .26s cubic-bezier(.16, 1, .3, 1), visibility 0s; }
 .nav-brand-group[data-player-active="true"] .nav-brand-name { opacity: 0; transform: translateY(-8px); visibility: hidden; pointer-events: none;
   transition: opacity .16s ease-out, transform .22s ease-out, visibility 0s .22s; }
 .nav-player { width: 280px; color: var(--color-ink); opacity: 0; transform: translateY(8px); visibility: hidden; pointer-events: none;

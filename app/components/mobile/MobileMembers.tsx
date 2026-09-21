@@ -32,7 +32,7 @@ export default function MobileMembers({ onJoinClick }: { onJoinClick: () => void
         <SectionHeader
           index={5}
           eyebrow="members"
-          title="队里的人"
+          title="历年成员"
           theme="light"
           className="mb-8"
         />

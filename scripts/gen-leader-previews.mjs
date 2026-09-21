@@ -5,6 +5,7 @@ import ts from 'typescript';
 import { readFile, mkdir, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { previewsAreCurrent } from './preview-freshness.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '../..');
 const source = await readFile(resolve(root, 'lib/data/leaders.ts'), 'utf8');
@@ -14,18 +15,24 @@ const js = ts.transpileModule(source, {
 const { LEADERS } = await import(`data:text/javascript,${encodeURIComponent(js)}`);
 const output = resolve(root, 'public/images/leader-previews');
 await mkdir(output, { recursive: true });
-let sourceBytes = 0, previewBytes = 0, sourcePixels = 0, previewPixels = 0;
+let sourceBytes = 0, previewBytes = 0, sourcePixels = 0, previewPixels = 0, skipped = 0;
 for (const [index, leader] of LEADERS.entries()) {
   const input = resolve(root, `public${leader.image}`);
+  const target = resolve(output, `${leader.id}.webp`);
+  if (await previewsAreCurrent([input, fileURLToPath(import.meta.url), resolve(root, 'lib/data/leaders.ts')], [target])) {
+    skipped++;
+    console.log(`[${index + 1}/${LEADERS.length}] ${leader.name}: unchanged, skipped`);
+    continue;
+  }
   const metadata = await sharp(input).metadata();
   const result = await sharp(input).rotate()
     .resize({ width: 1600, height: 960, fit: 'inside', withoutEnlargement: true })
     .webp({ quality: 86 })
-    .toFile(resolve(output, `${leader.id}.webp`));
+    .toFile(target);
   sourceBytes += (await stat(input)).size;
   previewBytes += result.size;
   sourcePixels += metadata.width * metadata.height;
   previewPixels += result.width * result.height;
   console.log(`[${index + 1}/${LEADERS.length}] ${leader.name}: ${metadata.width}x${metadata.height} -> ${result.width}x${result.height}, ${(result.size / 1024).toFixed(1)} KB`);
 }
-console.log(JSON.stringify({ sourceBytes, previewBytes, sourcePixels, previewPixels }, null, 2));
+console.log(JSON.stringify({ generated: LEADERS.length - skipped, skipped, sourceBytes, previewBytes, sourcePixels, previewPixels }, null, 2));

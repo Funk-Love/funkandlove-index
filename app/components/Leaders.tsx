@@ -10,7 +10,6 @@ import LeaderCard from "./shared/LeaderCard";
 import SectionHeader from "./ui/SectionHeader";
 import LeaderDetail from "./shared/LeaderDetail";
 import DetailSheet from "./shared/DetailSheet";
-import { getModalBorderStyle } from "./shared/leaderStyles";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -127,9 +126,8 @@ function Leaders() {
       onClose={closeLeader}
       ariaLabel={selectedLeader ? `${selectedLeader.name} 详情` : "队长详情"}
       variant="modal"
-      panelClassName={`relative max-w-2xl w-full bg-paper text-ink rounded-3xl overflow-hidden shadow-paper border-2 ${
-        selectedLeader ? getModalBorderStyle(selectedLeader.role) : "border-ink"
-      }`}
+      panelClassName="people-panel leader-panel"
+      closeButtonClassName="people-close"
     >
       {selectedLeader && <LeaderDetail leader={selectedLeader} />}
     </DetailSheet>

@@ -1,9 +1,8 @@
 "use client";
 
-import { Crown } from "lucide-react";
 import type { Leader } from "@/lib/types";
 import { asset } from "@/lib/cdn";
-import { getRoleBadgeStyle } from "./leaderStyles";
+import "./people-details.css";
 
 interface Props {
   leader: Leader;
@@ -14,44 +13,23 @@ interface Props {
  * 用于 <DetailSheet> 的 children。
  */
 export default function LeaderDetail({ leader }: Props) {
-  const isFounder = leader.role === "founder";
   const imageSrc = asset(leader.image);
 
   return (
-    <>
-      {isFounder && (
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-role-founder via-role-founder-2 to-role-founder z-10" />
-      )}
-
-      <div className="relative h-72 sm:h-80 overflow-hidden bg-stage-2">
-        <div
-          className="absolute inset-0 bg-cover bg-no-repeat"
-          style={{
-            backgroundImage: `url(${imageSrc})`,
-            backgroundPosition: `center ${leader.modalY || "50%"}`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/40 to-transparent" />
+    <article className="leader-profile" data-role={leader.role}>
+      <div className="leader-profile-photo">
+        <img src={imageSrc} alt={leader.name} decoding="async"
+          style={{ objectPosition: `${leader.cardX ?? "50%"} ${leader.modalY ?? "50%"}` }} />
       </div>
-
-      <div className="p-6 sm:p-8 -mt-16 relative">
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span
-            className={`inline-block px-4 py-1.5 text-sm font-bold rounded-full ${getRoleBadgeStyle(
-              leader.role
-            )}`}
-          >
-            {leader.term} · {leader.title}
-          </span>
-          {isFounder && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold bg-paper text-ink rounded-full border border-ink">
-              <Crown className="w-3 h-3" strokeWidth={2.5} /> 建队
-            </span>
-          )}
+      <div className="leader-profile-copy">
+        <h2>{leader.name}</h2>
+        <div className="leader-profile-meta">
+          <span>{leader.term}</span>
+          <span className="leader-profile-role"><i aria-hidden />{leader.title}</span>
         </div>
-        <h3 className="font-display text-4xl text-ink mb-4">{leader.name}</h3>
-        {leader.bio && <p className="text-lg text-ink-2 leading-relaxed">{leader.bio}</p>}
+        {leader.bio && <p className="leader-profile-bio">{leader.bio}</p>}
+        <p className="leader-profile-signature font-display">Funk <span className="font-sans">&amp;</span> Love</p>
       </div>
-    </>
+    </article>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Users, Camera, Flame, Crown, UserCircle, Share2, LucideIcon } from "lucide-react";
+import { UsersRound, Images, AudioLines, Flag, ContactRound, Radio, LucideIcon } from "lucide-react";
 
 interface SectionConfig {
   id: string;
@@ -11,12 +11,12 @@ interface SectionConfig {
 }
 
 const SECTION_CONFIG: SectionConfig[] = [
-  { id: "team-info", label: "关于我们", icon: Users },
-  { id: "team", label: "团队合照", icon: Camera },
-  { id: "features", label: "团队特色", icon: Flame },
-  { id: "leaders", label: "历年队长", icon: Crown },
-  { id: "members", label: "历年成员", icon: UserCircle },
-  { id: "social", label: "关注我们", icon: Share2 },
+  { id: "team-info", label: "关于我们", icon: UsersRound },
+  { id: "team", label: "团队合照", icon: Images },
+  { id: "features", label: "团队特色", icon: AudioLines },
+  { id: "leaders", label: "历年队长", icon: Flag },
+  { id: "members", label: "历年成员", icon: ContactRound },
+  { id: "social", label: "关注我们", icon: Radio },
 ];
 
 interface SectionIndicatorProps {
@@ -134,7 +134,7 @@ export default function SectionIndicator({
                       isActive ? "text-paper" : "text-ink/45 group-hover:text-ink"
                     }`}
                   >
-                    <Icon size={18} strokeWidth={isActive ? 2.5 : 1.75} className="lg:w-5 lg:h-5" />
+                    <Icon size={18} strokeWidth={1.75} className="lg:w-5 lg:h-5" aria-hidden />
                   </span>
                 </button>
               );

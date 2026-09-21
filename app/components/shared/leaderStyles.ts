@@ -46,17 +46,3 @@ export function getTitleColor(role: Leader["role"]): string {
       return "text-paper-3";
   }
 }
-
-/** 详情弹窗边框 */
-export function getModalBorderStyle(role: Leader["role"]): string {
-  switch (role) {
-    case "founder":
-      return "border-role-founder";
-    case "captain":
-      return "border-role-captain";
-    case "vice":
-      return "border-role-vice";
-    default:
-      return "border-ink";
-  }
-}

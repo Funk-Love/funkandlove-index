@@ -65,11 +65,14 @@ Funk & Love 是浙江大学 DFM 街舞社的 Locking 团队官方网站。以 70
 
 ### 安装依赖
 
-准备 Node.js 与 npm，并补齐本地维护的 `public/` 静态资源。该目录不入库，包含构建时直接导入的 `audio/music/library.json` 和生成队长预览图所需的原始照片；仅下载代码不能完成构建。
+准备 Node.js 与 npm：
 
 ```bash
 npm ci
+npm run fetch-assets     # 从 OSS 拉 public/ 静态资源，约 133 MB
 ```
+
+`public/` 不入库，仅下载代码不能完成构建 —— `audio/music/library.json` 在构建期被直接 import，预览图生成器要读队长与成员原图。资源托管在公有读的 OSS 上，`fetch-assets` 按仓库里的 `asset-manifest.json` 拉取，不需要密钥。宣传片 1.2 GB 默认跳过，要改视频播放器时用 `npm run fetch-assets -- --all`。详见 [静态资源说明](docs/STATIC_ASSETS.md)。
 
 ### 开发环境
 
@@ -104,6 +107,8 @@ npm run lint      # ESLint
 npm run leader-previews  # 更换队长照片后，单独更新卡片 WebP
 npm run member-previews  # 更换成员照片后，更新圆头像与网格 WebP
 npm run lqip      # 为大图生成 LQIP 占位图(scripts/gen-lqip.mjs)
+npm run fetch-assets     # 从 OSS 拉 public/ 资源(--tier= / --all / --dry-run)
+npm run asset-manifest   # 增删 public/ 文件后重写 asset-manifest.json
 node scripts/transcode-video.mjs   # 宣传片转 HLS 多码率切片
 ```
 
@@ -156,7 +161,7 @@ funkandlove-index/
 
 ### 静态资源
 
-`public/` 已被 gitignore，图片、视频、音频及曲库清单在本地和 OSS 上维护。关键文件：
+`public/` 已被 gitignore，图片、视频、音频及曲库清单在本地和 OSS 上维护。资源地址、拉取方式与三档划分见 [静态资源说明](docs/STATIC_ASSETS.md)；清单 `asset-manifest.json` 入库。关键文件：
 
 - `images/hero/` - 黑胶场景贴图与首屏静帧
 - `images/team-bg.jpg` - 团队合照背景(原图 6000px 级,线上经 OSS 处理限宽 3840 转 webp；Hero 不再使用合照作为固定底图)
@@ -185,18 +190,23 @@ funkandlove-index/
 npm run deploy
 ```
 
-流程:`next build` 产出 `out/` → `ossutil sync out/ oss://funkandlove-index/ --delete -f` 增量镜像同步。
+流程：生成需要更新的预览图 → `next build` 产出 `out/` → `ossutil sync out/ oss://funkandlove-index/ --delete --update -f` 增量镜像同步。
+
+`--update` 按修改时间跳过线上已有且不比本地旧的文件；`--delete` 删除线上多余文件，部署前应确保本地静态资源完整。预览图生成器检查源图、对应数据文件及生成脚本的修改时间，输出齐全且未过期时跳过，不重写图片时间戳。源图、数据映射或生成参数变更，以及输出缺失时会重新生成。部署脚本保存为 UTF-8 BOM，兼容 Windows PowerShell 5.1。
 
 前置条件:已安装 ossutil,且 `~/.ossutilconfig` 配好 endpoint 与 AccessKey。密钥不进仓库。
 
 ## 开发团队
 
-- **开发者**: Hofmann88
+- **原作者**: [Hofmann8](https://github.com/Hofmann8) — 2025 年 11 月创建，初版全部开发
 - **团队**: Funk & Love - 浙江大学DFM街舞社Locking团队
+- 贡献者名单见 [AUTHORS.md](AUTHORS.md)
 
 ## License
 
-MIT License
+[MIT](LICENSE) © 2025-2026 Hofmann8
+
+分发或二次开发须保留 [LICENSE](LICENSE) 中的版权声明。
 
 ---
 

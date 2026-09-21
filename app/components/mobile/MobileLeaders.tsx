@@ -82,6 +82,8 @@ export default function MobileLeaders() {
         open={selected !== null}
         onClose={() => setSelected(null)}
         variant="sheet"
+        panelClassName="people-panel leader-panel"
+        closeButtonClassName="people-close"
         ariaLabel={selected ? `${selected.name} 详情` : undefined}
       >
         {selected && <LeaderDetail leader={selected} />}

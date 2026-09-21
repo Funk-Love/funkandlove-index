@@ -2,6 +2,12 @@
   "name": "funkandlove-index",
   "version": "0.1.0",
   "private": true,
+  "author": "Hofmann8 (https://github.com/Hofmann8)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hofmann8/funkandlove-index.git"
+  },
   "scripts": {
     "dev": "next dev",
     "prebuild": "npm run leader-previews && npm run member-previews",
@@ -11,6 +17,8 @@
     "lqip": "node scripts/gen-lqip.mjs",
     "leader-previews": "node scripts/gen-leader-previews.mjs",
     "member-previews": "node scripts/gen-member-previews.mjs",
+    "fetch-assets": "node scripts/fetch-assets.mjs",
+    "asset-manifest": "node scripts/gen-asset-manifest.mjs",
     "deploy": "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1"
   },
   "dependencies": {

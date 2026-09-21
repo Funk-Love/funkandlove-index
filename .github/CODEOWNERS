@@ -1,0 +1,6 @@
+# 所有改动都需要原作者审核后才能合并。
+# 生效前提:在 master 的分支保护里勾上
+#   Require a pull request before merging
+#   Require review from Code Owners
+#   Do not allow force pushes   ← 这条防的是有人重写历史抹掉提交署名
+* @Hofmann8

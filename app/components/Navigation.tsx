@@ -114,7 +114,7 @@ export default function Navigation({ onJoinClick, onNavigate }: Props) {
           <div className="flex items-center justify-between" style={{ height: NAV_HEIGHT }}>
             {/* 品牌 */}
             <NavPlayer onHome={() => scrollToSection("#hero")}
-              brandClassName={isScrolled ? "text-ink hover:text-accent-600" : "text-paper hover:text-pop-500"} />
+              brandClassName={isScrolled ? "text-ink [--brand-hover:var(--color-accent-600)]" : "text-paper [--brand-hover:var(--color-pop-500)]"} />
 
             {/* 链接 */}
             <div className="desktop-nav-links flex items-center gap-6">

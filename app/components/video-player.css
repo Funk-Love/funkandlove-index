@@ -1,5 +1,86 @@
-/* Funk & Love Plyr 主题:主色走 accent token,其余保留 Plyr 默认。 */
-
+/* Keep Plyr's native control layout, responsive behavior and focus handling. */
 .plyr-funk {
-  --plyr-color-main: var(--color-accent-500);
+  container-type: inline-size;
+  --plyr-color-main: var(--color-action);
+  --plyr-font-family: var(--font-sans);
+  --plyr-video-background: var(--color-stage);
+  --plyr-control-radius: 4px;
+  --plyr-control-icon-size: 16px;
+  --plyr-focus-visible-color: var(--color-pop-500);
+  --plyr-video-control-color: var(--color-paper);
+  --plyr-video-control-color-hover: var(--color-ink);
+  --plyr-video-control-background-hover: var(--color-pop-500);
+  --plyr-range-fill-background: var(--color-pop-500);
+  --plyr-range-thumb-background: var(--color-paper);
+  --plyr-range-thumb-height: 10px;
+  --plyr-range-track-height: 3px;
+  --plyr-video-range-track-background: color-mix(in srgb, var(--color-paper) 24%, transparent);
+  --plyr-video-progress-buffered-background: color-mix(in srgb, var(--color-paper) 35%, transparent);
+  --plyr-menu-background: var(--color-paper);
+  --plyr-menu-color: var(--color-ink);
+  --plyr-menu-radius: 8px;
+  --plyr-font-size-menu: 13px;
+  --plyr-menu-shadow: var(--shadow-paper);
+  --plyr-menu-back-border-color: var(--color-paper-4);
+  --plyr-tooltip-background: var(--color-paper);
+  --plyr-tooltip-color: var(--color-ink);
+  --plyr-tooltip-radius: 4px;
+  --plyr-tooltip-shadow: var(--shadow-paper-sm);
+  --plyr-badge-background: var(--color-paper-2);
+  --plyr-badge-text-color: var(--color-ink-muted);
+}
+.plyr-funk .plyr--video > .plyr__controls {
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-stage) 94%, transparent);
+}
+/* Resting poster stays clear; keyboard focus still reveals every control. */
+.plyr-funk .plyr--stopped:not(:focus-within) > .plyr__controls {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .plyr-funk .plyr--stopped:not(:focus-within):hover > .plyr__controls {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+.plyr-funk .plyr__time { font-variant-numeric: tabular-nums; }
+.plyr-funk .plyr__control--overlaid {
+  width: 64px;
+  height: 64px;
+  padding: 21px;
+  border: 1px solid var(--color-paper-4);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 20%);
+  transition: background-color .18s, color .18s, opacity .2s;
+}
+.plyr-funk .plyr:not(.plyr--playing) > .plyr__control--overlaid { opacity: 1; }
+.plyr-funk .plyr__control--overlaid svg { width: 20px; height: 20px; }
+.plyr-funk .plyr__control--overlaid:is(:hover, :focus-visible) { background: var(--color-pop-500); color: var(--color-ink); }
+.plyr-funk .plyr__menu__container {
+  max-height: min(360px, max(64px, calc(100cqw * 9 / 16 - 76px)));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--color-paper-4) var(--color-paper);
+}
+.plyr-funk .plyr__menu__container .plyr__control { padding-top: 8px; padding-bottom: 8px; }
+.plyr-funk .plyr__menu__container .plyr__control[role="menuitemradio"]::before { background: var(--color-paper-3); }
+.plyr-funk .plyr__menu__container .plyr__control[aria-checked="true"]::before { background: var(--color-action); }
+@container (max-width: 420px) {
+  .plyr-funk .plyr--video > .plyr__controls { left: 0; right: 0; bottom: 0; border-radius: 0; padding: 22px 5px 5px; }
+  .plyr-funk .plyr__controls .plyr__progress__container { position: absolute; top: 3px; left: 12px; right: 12px; margin: 0; padding: 0; }
+  .plyr-funk .plyr__volume input[type="range"] { min-width: 32px; max-width: 44px; }
+  .plyr-funk .plyr__control--overlaid { width: 52px; height: 52px; padding: 15px; }
+}
+.plyr-funk .plyr--fullscreen-active > .plyr__controls {
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
 }

@@ -1,64 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Clock, ArrowRight } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 import { GENERATIONS } from "@/lib/data/members";
 import type { Generation as GenerationData } from "@/lib/types";
 import { useReveal } from "../hooks/useReveal";
 import SectionHeader from "./ui/SectionHeader";
-import DetailSheet, { DEFAULT_PANEL } from "./shared/DetailSheet";
+import DetailSheet from "./shared/DetailSheet";
 import NextMember from "./shared/NextMember";
 import MemberAvatar from "./shared/MemberAvatar";
+import "./shared/people-details.css";
 
-/**
- * 成员详情弹窗内容:纸面面板(DetailSheet 默认),顶部 accent→pop 色条,成员 3:4 纸框网格。
- */
+/** 按届次浏览的照片册：固定页头，照片区独立滚动。 */
 function MembersModalBody({ generation }: { generation: GenerationData }) {
   return (
-    <div className="flex flex-col max-h-[85vh]">
-      <div className="h-1.5 shrink-0 bg-linear-to-r from-accent-500 via-pop-500 to-accent-500" />
-
-      {/* 头部 */}
-      <div className="shrink-0 px-8 pt-7 pb-5 border-b border-ink/15">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-pop-500/30 border border-ink/10">
-            <Users className="w-7 h-7 text-accent-600" strokeWidth={2} />
-          </div>
-          <div>
-            <p className="font-mono text-xs tracking-[0.12em] uppercase text-ink-muted">
-              class of {generation.year}
-            </p>
-            <h3 className="font-display text-ink leading-tight text-[clamp(1.5rem,3.2vh,2rem)]">
-              {generation.term}成员
-            </h3>
-            <p className="text-ink-muted text-sm mt-0.5">
-              {generation.year}年入队 · {generation.members.length}位成员
-            </p>
-          </div>
+    <div className="members-album">
+      <header className="members-album-header">
+        <div>
+          <h2>{generation.term}成员</h2>
+          <p>{generation.year}年入队 · {generation.members.length}位成员</p>
         </div>
-      </div>
-
-      {/* 成员网格 */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-8 py-7">
+        <span className="members-album-year font-display" aria-hidden>{generation.year}</span>
+      </header>
+      <div className="members-album-grid" tabIndex={0} role="region" aria-label="成员照片">
         {generation.isCollecting ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Clock className="w-14 h-14 text-ink-faint mb-4" strokeWidth={1.5} />
-            <p className="text-xl font-bold text-ink-2">正在收集历史资料中...</p>
-            <p className="text-ink-muted mt-2">如果你有这一届的照片，欢迎联系我们</p>
+          <div className="members-album-empty">
+            <h3>正在收集历史资料中...</h3>
+            <p>如果你有这一届的照片，欢迎联系我们</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+          <div className="members-album-photos">
             {generation.members.map((member) => (
-              <figure key={member.name} className="group">
-                <div className="aspect-3/4 rounded-xl overflow-hidden bg-paper-2 border border-ink/15 transition-[border-color,box-shadow] duration-200 group-hover:border-ink group-hover:shadow-paper-sm">
-                  <MemberAvatar
-                    member={member}
-                    className="w-full h-full transition-transform duration-500 group-hover:scale-105"
-                  />
+              <figure key={member.name}>
+                <div className="members-album-photo">
+                  <MemberAvatar member={member} />
                 </div>
-                <figcaption className="mt-2 text-center text-ink font-bold text-sm">
-                  {member.name}
-                </figcaption>
+                <figcaption>{member.name}</figcaption>
               </figure>
             ))}
           </div>
@@ -67,7 +44,6 @@ function MembersModalBody({ generation }: { generation: GenerationData }) {
     </div>
   );
 }
-
 /**
  * 时间线节点:左侧年份(display 字体)+ 芥末黄节点 + 右侧届次卡。
  * 可点击的届次是 <button>;资料收集中的届次是静态 div(虚线框)。
@@ -179,7 +155,7 @@ export default function Members({ onJoinClick }: { onJoinClick: () => void }) {
             <SectionHeader
               index={5}
               eyebrow="members"
-              title="队里的人"
+              title="历年成员"
               theme="light"
             />
 
@@ -215,7 +191,8 @@ export default function Members({ onJoinClick }: { onJoinClick: () => void }) {
         open={selectedGeneration !== null}
         onClose={() => setSelectedGeneration(null)}
         variant="modal"
-        panelClassName={`${DEFAULT_PANEL} lg:max-w-4xl`}
+        panelClassName="people-panel members-panel"
+        closeButtonClassName="people-close"
         ariaLabel={selectedGeneration ? `${selectedGeneration.term}成员` : "成员详情"}
       >
         {selectedGeneration && <MembersModalBody generation={selectedGeneration} />}
